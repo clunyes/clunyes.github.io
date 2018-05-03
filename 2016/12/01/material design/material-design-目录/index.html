@@ -1,0 +1,951 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.0.6" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.png?v=6.0.6">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.png?v=6.0.6">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.png?v=6.0.6">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.0.6" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '6.0.6',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  
+  <meta name="keywords" content="Hexo, NexT" />
+
+
+<meta name="description" content="https://material.google.com/地址md作为android开发的规范，对于开发、产品、设计都很有意义，我会持续完善这份文档。material design Introduction Environment Material properties 这章说明了md就是各种元素都在自己的层面上，我的理解就是z轴值不一样，这样界面看上去就很有层次感 Elevation and sh">
+<meta property="og:type" content="article">
+<meta property="og:title" content="material-design-目录">
+<meta property="og:url" content="http://clunyes.github.io/2016/12/01/material design/material-design-目录/index.html">
+<meta property="og:site_name" content="clunyes_blog">
+<meta property="og:description" content="https://material.google.com/地址md作为android开发的规范，对于开发、产品、设计都很有意义，我会持续完善这份文档。material design Introduction Environment Material properties 这章说明了md就是各种元素都在自己的层面上，我的理解就是z轴值不一样，这样界面看上去就很有层次感 Elevation and sh">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2018-03-15T03:40:17.573Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="material-design-目录">
+<meta name="twitter:description" content="https://material.google.com/地址md作为android开发的规范，对于开发、产品、设计都很有意义，我会持续完善这份文档。material design Introduction Environment Material properties 这章说明了md就是各种元素都在自己的层面上，我的理解就是z轴值不一样，这样界面看上去就很有层次感 Elevation and sh">
+
+
+
+
+
+
+  <link rel="canonical" href="http://clunyes.github.io/2016/12/01/material design/material-design-目录/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>material-design-目录 | clunyes_blog</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"> 
+
+<div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">clunyes_blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+          
+  <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />Home</a>
+</li>
+
+      
+        
+        
+          
+  <li class="menu-item menu-item-about">
+    <a href="/about/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-user"></i> <br />About</a>
+</li>
+
+      
+        
+        
+          
+  <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />Archives</a>
+</li>
+
+      
+
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+  
+
+
+
+ </div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://clunyes.github.io/2016/12/01/material design/material-design-目录/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="clunyes">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="clunyes_blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">material-design-目录</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-12-01T14:31:41+08:00">2016-12-01</time>
+            
+
+            
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h3 id="https-material-google-com-地址"><a href="#https-material-google-com-地址" class="headerlink" title="https://material.google.com/地址"></a><a href="https://material.google.com/地址" target="_blank" rel="noopener">https://material.google.com/地址</a></h3><h3 id="md作为android开发的规范，对于开发、产品、设计都很有意义，我会持续完善这份文档。"><a href="#md作为android开发的规范，对于开发、产品、设计都很有意义，我会持续完善这份文档。" class="headerlink" title="md作为android开发的规范，对于开发、产品、设计都很有意义，我会持续完善这份文档。"></a>md作为android开发的规范，对于开发、产品、设计都很有意义，我会持续完善这份文档。</h3><h2 id="material-design"><a href="#material-design" class="headerlink" title="material design"></a>material design</h2><ol>
+<li>Introduction</li>
+<li>Environment</li>
+<li>Material properties 这章说明了md就是各种元素都在自己的层面上，我的理解就是z轴值不一样，这样界面看上去<br>就很有层次感</li>
+<li>Elevation and shadows（高度，阴影）(前三章都在介绍md是啥，这章给出了<font color="af8888">elevation的标准</font>，非常重要)</li>
+<li>What’s new md是不断更新的，md就像一个协议，不断更新所以是有生命力的（牛逼）</li>
+</ol>
+<h2 id="Motion（手势，动作）"><a href="#Motion（手势，动作）" class="headerlink" title="Motion（手势，动作）"></a>Motion（手势，动作）</h2><ol>
+<li>Material motion 核心动画要点1.要快，2.要简洁，3.同一个app相同意义的动画要一致</li>
+<li>Duration and easing 动画自然，曲线动画都是先x轴快，过了中点就是y轴快，<br>还有就是要快，不要放慢动画</li>
+<li>Movement 竖直动画，不要曲线，暗合简洁的概念<ol>
+<li>Transforming material 变形动画，这章内容涉及的就很细了，关键的一点就是，1做动画的按钮要是圆<br>形的，2还有就是矩形扩大缩小的动画，在宽度和高度的变化的时候有先后顺序</li>
+<li>Choreography（有道一下：是编舞）讲了一些切换动画的注意点，说实话没太看懂，总而言之，<br>做动画不要搞非主流，快而简洁的动画是关键 </li>
+<li>Creative customization（创造性定制）部分系统按钮，有两个状态</li>
+</ol>
+</li>
+</ol>
+<h2 id="Style"><a href="#Style" class="headerlink" title="Style"></a>Style</h2><ol>
+<li>Color 这里有几个颜色要注意：<ol>
+<li>Primary color 主色，会大量使用</li>
+<li>Secondary color 用于相关的操作和信息，会比主色深一些或者浅一些，主要看主色是什么色调的</li>
+<li>Accent color 用于交互元素或者float action button（fab），接下来就是一些配色，<br>接下来看了个light theme和dark theme</li>
+</ol>
+</li>
+<li>Icons 图标的制作这个<font color="af8888">绝壁是给ui看的，希望各位ui能看一下</font>，总结就是不要非主流，要有立体感，<br>遵循集合原理。（参考<a href="https://material.google.com/style/icons.html#icons-system-icons）" target="_blank" rel="noopener">https://material.google.com/style/icons.html#icons-system-icons）</a></li>
+<li>Imagery 意象（吐槽下google这几个页面太大了，翻墙很吃力)，适合所有人看的一章，图片该怎样，不该怎么样，有些挺有道理的</li>
+<li>Typography（排版）  <a href="http://clunyes.github.io/2016/12/07/material-design字体排版/">文字排版单开了一篇文章</a></li>
+<li>Writing 这个很适合我们仔细研读，由于我要开发app的2.0版本，<br><a href="http://clunyes.github.io/2016/12/1/material-design-writing-产品都应该看/">这里我先欠着我会记得的</a>，<br>我也会看的，因为我是半个移动端的产品.</li>
+</ol>
+<h2 id="Layout"><a href="#Layout" class="headerlink" title="Layout"></a>Layout</h2><ol>
+<li>Principles 提出了seam和step的概念，以及fab放在seam和step上面</li>
+<li>Units and measurements <a href="http://clunyes.github.io/2016/12/07/屏幕密度思考/">屏幕密度，设计开发注意事项，我在这里详细说明了</a></li>
+<li>Metrics &amp; keylines（度量，基准线）<font color="af8888">一些边距，包括常用的title listview等等，还有桌面和平板的规范也有，不过我现在只做手机的<br>，比例基准（这个没怎么看太懂），可点击空间的尺寸 touch targets should be at least 48 x 48 dp，Avatar: 40dp Icon: 24dp。<br>Touch target on both: 48dp，Touch target height: 48dp，Button height: 36dp这些是硬性规定。规范很重要。</font></li>
+<li>Structure 结构 必有的appbar+fab 不必有的bottombar，Side nav menus，其中appbar就是特殊的toolbar，appbar可以展开，<br>高度就是56dp+内容高度。statusbar，沉浸式允许隐藏statusbar，点击或者滑动，statusbar显示</li>
+<li>Responsive UI 这章没看懂。我的理解是屏幕变换的时候，ui的排列，具体到手机是横竖屏转换</li>
+<li>Split screen 分屏，没看懂</li>
+</ol>
+<h2 id="Components-非常关键的一章，涉及了几乎所有的控件的定义以及规范，开发人员应该严格遵循"><a href="#Components-非常关键的一章，涉及了几乎所有的控件的定义以及规范，开发人员应该严格遵循" class="headerlink" title="Components 非常关键的一章，涉及了几乎所有的控件的定义以及规范，开发人员应该严格遵循"></a>Components 非常关键的一章，涉及了几乎所有的控件的定义以及规范，开发人员应该严格遵循</h2><ol>
+<li><p>Bottom navigation </p>
+<ol>
+<li>对于底部导航数目，item尺寸，颜色都做了说明。</li>
+<li>Behavior这个很关键，Navigation through the bottom navigation bar should reset the task state.<br>reset就是说，点击item切换之后，列表返回初始状态，不管之前什么状态，点击当前item回到列表最上方。</li>
+<li>The bottom navigation bar can appear and disappear dynamically upon scrolling:Scrolling downward hides the bottom navigation bar<br>Scrolling upward reveals it，<font color="af8888">上滑bottombar消失，下滑出现</font>。</li>
+<li>结尾处交代了阴影的高度</li>
+</ol>
+</li>
+<li><p>Bottom sheets(底部页面)</p>
+<ol>
+<li>分为persistent底部页面，modal底部页面</li>
+<li>modal用于分享，persistent一直都是有的，和app内容有比较大的关联度</li>
+<li>最后介绍了具体尺寸规范</li>
+</ol>
+</li>
+<li><p>Buttons</p>
+<ol>
+<li>Flat buttons 纯文字的button，文字要大些指的是英文，点击会有墨水效果，但是不会lift，lift应该是elevation变化的效果。</li>
+<li>Raised buttons 矩形按钮，点击会有墨水效果，还有lift效果</li>
+<li>fab 圆形的按钮，其余和raised button一样 </li>
+<li>这里对button的size有着很明确的说明，以后我会整理一片文章，把size有关的信息单独列出来 </li>
+<li>最后介绍了，dropdown button也就是dropdown list，还有togglebutton</li>
+</ol>
+</li>
+<li><p>Buttons: Floating Action Button</p>
+<ol>
+<li>fab定义是页面中最常用的按钮有两种size，默认size 56*56，mini size，用于连接页面</li>
+<li>一个页面最多一个fab</li>
+<li>fab用于积极的操作，创建，不要用于删除等其他操作 </li>
+<li>后面介绍了fab的使用规范，哪些ok哪些不对</li>
+</ol>
+</li>
+<li><p>Cards</p>
+<ol>
+<li>cards统一有2dp的corner</li>
+<li>item如果没有很多操作的话，不要用cards</li>
+<li>cards 的布局可以很多样</li>
+<li>For developers android cards/Polymer card</li>
+<li>cards支持的操作 swipe，pick up and move（重新排序）</li>
+<li>cards内部不要使用滑动，要显示完全或者使用折叠</li>
+<li>各种cards的尺寸，使用cards进行开发，完全可以参照这个文档</li>
+<li>两种分割线的区别，区块分割线（到头），内容分割线（使用padding的）</li>
+</ol>
+</li>
+<li><p>Chips small block 小块 这个控件用的比较少的，在手机群发短信的时候见到过</p>
+</li>
+<li>Data tables 用于桌面应用，忽略</li>
+<li>Dialogs <ol>
+<li>类型：1 alert 2 simple menu 3 simple dialog 4 confirmation dialog</li>
+<li>全屏dialog和全屏的bottomsheet完全一样</li>
+<li>打个比方，删除对话框：是否删除该条记录，两个选项文案应该是取消，删除，而不是取消，确定。</li>
+<li>带有title的dialog用于高危的情况，需要用户确实知道情况。</li>
+<li>simple dialog不需要cancel按钮，取消按钮总是放在左边</li>
+<li>dialog中不要给用户模糊的选项</li>
+<li>最后介绍了dialog的size</li>
+</ol>
+</li>
+<li>Dividers 使用的注意事项，没啥特别的重点。</li>
+<li>Expansion panels 用于创建和轻量的编辑</li>
+<li><p>Grid lists 可用于替代标准的listview</p>
+<ol>
+<li>适合做imagegallery，介绍了一些尺寸，其实这种控件不是很常用，两行用cards更适合</li>
+</ol>
+</li>
+<li><p>Lists</p>
+<ol>
+<li>超过两行的文案，建议使用cards</li>
+<li>把最重要的内容放在左面，把最不重要的内容放在右边</li>
+<li>各种list的size，list开发界面规范见此</li>
+</ol>
+</li>
+<li><p>Lists: Controls list上的操作</p>
+<ol>
+<li>checkbox可以是主action，可以是辅action</li>
+<li>Switch（开关），Reorder（重新，排序），Expand/collapse（展开收回）是辅action</li>
+<li>Leave-behinds，隐藏操作，通过从左向右滑动item 或者从右向左滑动item，出现操作</li>
+<li>menu是一类特别的list，操作规则适用于dropdown menus, overflow menus，和标准的list不一样</li>
+</ol>
+</li>
+<li><p>Menus 一个暂时的选择列表，开发一般用popupwindow来实现</p>
+<ol>
+<li>menu必须在所有ui之上，而且要遮住当前要编辑的内容（这个和目前国内大部分app的设计<br>有些不一样）</li>
+<li>使用simple menu来实现（见dialog那一章，提到了simple menu）</li>
+<li>menu弹出的位置很有讲究，具体看配图</li>
+<li>最后照例是尺寸说明</li>
+</ol>
+</li>
+<li><p>Pickers 主要讲的就是date picker和timer picker，用系统自带的就行</p>
+</li>
+<li><p>Progress &amp; activity 这里指的是进度指示</p>
+<ol>
+<li>进度包括：确定的、不确定的、buffer缓冲的、不确定查询返回确定的值，常用的场景就是前3种</li>
+<li>包括线条装loading，圆形loading</li>
+<li>分阶段加载：容器先出来，内容再出来，不需要太细究</li>
+</ol>
+</li>
+<li><p>Selection controls 用于选择的操作控件</p>
+<ol>
+<li>Checkbox 多选框</li>
+<li>Radio button 单选框 </li>
+<li>Switch 开关  </li>
+<li>状态为hover, focused, pressed, disabled, and disabled focused states.</li>
+</ol>
+</li>
+<li><p>Sliders 滑动条</p>
+<ol>
+<li>持续滑块，可以连续滑动</li>
+<li>离散滑块（每一单元值是固定，单元是滑动最小单位）</li>
+</ol>
+</li>
+<li><p>Snackbars &amp; toasts 都是简单用户操作反馈</p>
+<ol>
+<li>snackbar可以点掉，toast不行</li>
+<li>snackbar不要挡住fab，把fab顶上去，snackbar不要加图标，尺寸和用法都在配图中说明了。</li>
+</ol>
+</li>
+<li>Steppers 很实用的控件，用于表示一系列操作的进度，<font color="af8888">特别适合用于填复杂<br>表格，这样的需求，也很适合新版app的测验</font><ol>
+<li>部分ui是tablet的ui，关心mobile就行，最后是尺寸说明</li>
+</ol>
+</li>
+<li>Subheaders 子标题，看下尺寸说明就好</li>
+<li>Tabs 顶部类目分类<ol>
+<li>tab类目要同一等级，tab类目不要有子类目</li>
+<li>tab页名字过长，可以两行，两行过长才用省略号表示</li>
+<li>最后是尺寸</li>
+</ol>
+</li>
+<li>Text fields 输入文案的控件<ol>
+<li>输入type：<strong>Number</strong>: Phone number, credit card number, PIN；<strong>Text</strong>: Proper name, username, URL<br>；<strong>Mixed format</strong>: Email address, street address, search query</li>
+<li>这边用的就是Textinputlayout</li>
+<li>Single-line text field，尺寸说明</li>
+<li>Multi-line text field，尺寸说明，超出行的最大限制，自动跳到下一行</li>
+<li>Full-width text field，用于深入的书写</li>
+<li>字数统计Character counter，监控字数用</li>
+<li>自动补全和搜索过滤</li>
+<li>最后介绍密码输入的各个情况,<strong>比较实用</strong></li>
+</ol>
+</li>
+<li>Toolbars 没看懂</li>
+<li>Tooltips 对于图标的功能说明<ol>
+<li>长按1.5秒之后，弹出功能说明，比如最常用的optionmenu，item长按会出现说明</li>
+</ol>
+</li>
+<li>Widgets 这里的widget指的是桌面小控件，暂时不涉及，而且没怎么看懂<h2 id="Patterns-模式，一些固定的模式套路，一类特定的问题"><a href="#Patterns-模式，一些固定的模式套路，一类特定的问题" class="headerlink" title="Patterns 模式，一些固定的模式套路，一类特定的问题"></a>Patterns 模式，一些固定的模式套路，一类特定的问题</h2></li>
+<li>Confirmation and acknowledgement 证实确认会减少用户的疑虑，snackbar来完成这类任务</li>
+<li>Data formats 一般用于日期时间，格式化，文案太长的，或者隐藏部分文案使用ellipses省略号</li>
+<li>Errors <ol>
+<li>如何处理error：明确告诉用户发生了什么，告诉用户如何解决，保存用户的输入（问题来了<br>都知道这样有问题，为啥不去处理，这里有问题）。</li>
+<li>输入的问题，和上面的23节一样，输入错误的提示</li>
+<li>同步异常，给用户再次连接的按钮</li>
+<li>网络异常，提示网络异常</li>
+</ol>
+</li>
+<li>Fingerprint 指纹，主要用于解锁和支付，登录注册，还有就是硬件支持指纹<br>极客学院找到中文版</li>
+<li>Gestures 手势  <a href="http://wiki.jikexueyuan.com/project/material-design/patterns/gestures.html" target="_blank" rel="noopener">http://wiki.jikexueyuan.com/project/material-design/patterns/gestures.html</a> 和英文原版一模一样</li>
+<li>Launch screens 启动页 <a href="http://wiki.jikexueyuan.com/project/material-design/patterns/launch-screens.html" target="_blank" rel="noopener">http://wiki.jikexueyuan.com/project/material-design/patterns/launch-screens.html</a></li>
+<li>Loading images 如何取加载图片</li>
+<li>Navigation 文章译文没有，讲了导航需要让用户清楚知晓，产品可以仔细看。<br>整理了一些概念，引入Hierarchy（层级），返回作为一种导航方式特地介绍。</li>
+<li>Navigation drawer 其实之前list介绍时，已经介绍了，受到ios的影响，国内并不流行抽屉式的菜单。<br>这章主要介绍尺寸。</li>
+<li>Navigational transitions 导航动画<ol>
+<li>父view到子view</li>
+<li>兄弟view切换，重点在于elevation，父到子elevation要有变化，体现层级不同，子到子elevation<br>不变</li>
+</ol>
+</li>
+<li>Notifications 消息，一般和推送结合起来使用<ol>
+<li>有事务的<br>有事务的包括：1.人与人交互的：短信电话 2.日常生活：闹钟 3. 修改某些状态用：暂停歌曲</li>
+<li>没有事务的<br>没有事务的包括 1. Opt-out 2. Opt-in ,用户可以通过设置，不接受opt-out的信息</li>
+<li>消息的创建应结合priority（优先级）和categories，具体的值和对应的意义，配图有说明<br>做到推送的时候，应该仔细阅读。</li>
+</ol>
+</li>
+<li>Permissions 权限<ol>
+<li>现在的权限都是，获取具体数据时获取的，不同于以往安装就获取权限。</li>
+<li>重要的权限在应用第一次开启时询问</li>
+<li>不重要的权限到具体使用时询问</li>
+<li>如果用户拒绝了权限，下次操作要提示用户去设置里修改权限</li>
+<li>如果涉及到核心权限被拒绝app无法正常运行，只能不让用户进入app</li>
+</ol>
+</li>
+<li>Scrolling techniques 滑动操作 <a href="http://wiki.jikexueyuan.com/project/material-design/patterns/scrolling-techniques.html" target="_blank" rel="noopener">http://wiki.jikexueyuan.com/project/material-design/patterns/scrolling-techniques.html</a></li>
+<li>Search 搜索，这个真没什么好说，做到了搜索可以参考下，之前Text fields 也有提到的</li>
+<li>Selection 这个一般在webview中比较常见，长按选择文案，进行后续操作，暂时没实现过，就不多说。</li>
+<li>Settings 让用户定义app应该做哪些事，定义了哪些do哪些don’t，开发到设置时，可以对比文档</li>
+<li>Swipe to refresh 下拉刷新，和列表结合使用</li>
+</ol>
+<h2 id="Growth-amp-communications-成长沟通，指的是培养用户"><a href="#Growth-amp-communications-成长沟通，指的是培养用户" class="headerlink" title="Growth &amp; communications 成长沟通，指的是培养用户"></a>Growth &amp; communications 成长沟通，指的是培养用户</h2><ol>
+<li>Onboarding 培训 说实话，这章对产品的体验而言很重要，但是需要投入大量的工作在其中。暂时不考虑</li>
+<li>Feature discovery 用户引导，和上一节一样，重要体验好，但是暂时不考虑</li>
+<li>Gesture education 效果目的很好，怎么实现是个问题</li>
+</ol>
+<h2 id="Usability-可用性"><a href="#Usability-可用性" class="headerlink" title="Usability 可用性"></a>Usability 可用性</h2><ol>
+<li>Accessibility <a href="http://wiki.jikexueyuan.com/project/material-design/usability/accessibility.html" target="_blank" rel="noopener">http://wiki.jikexueyuan.com/project/material-design/usability/accessibility.html</a><br>译文和原文一样</li>
+<li>Bidirectionality <a href="http://wiki.jikexueyuan.com/project/material-design/usability/bidirectionality.html" target="_blank" rel="noopener">http://wiki.jikexueyuan.com/project/material-design/usability/bidirectionality.html</a><br>译文和原文一样</li>
+</ol>
+<p>最后一章资源，提供了下载。</p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/11/29/material design/material-design/" rel="next" title="material design">
+                <i class="fa fa-chevron-left"></i> material design
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/12/01/material design/material-design-writing-产品都应该看/" rel="prev" title="material design writing 产品都应该看">
+                material design writing 产品都应该看 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/avatar.png"
+                alt="clunyes" />
+            
+              <p class="site-author-name" itemprop="name">clunyes</p>
+              <p class="site-description motion-element" itemprop="description">好想去看dac</p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">54</span>
+                    <span class="site-state-item-name">posts</span>
+                  </a>
+                </div>
+              
+
+              
+
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#https-material-google-com-地址"><span class="nav-number">1.</span> <span class="nav-text">https://material.google.com/地址</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#md作为android开发的规范，对于开发、产品、设计都很有意义，我会持续完善这份文档。"><span class="nav-number">2.</span> <span class="nav-text">md作为android开发的规范，对于开发、产品、设计都很有意义，我会持续完善这份文档。</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#material-design"><span class="nav-number"></span> <span class="nav-text">material design</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Motion（手势，动作）"><span class="nav-number"></span> <span class="nav-text">Motion（手势，动作）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Style"><span class="nav-number"></span> <span class="nav-text">Style</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Layout"><span class="nav-number"></span> <span class="nav-text">Layout</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Components-非常关键的一章，涉及了几乎所有的控件的定义以及规范，开发人员应该严格遵循"><span class="nav-number"></span> <span class="nav-text">Components 非常关键的一章，涉及了几乎所有的控件的定义以及规范，开发人员应该严格遵循</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Patterns-模式，一些固定的模式套路，一类特定的问题"><span class="nav-number"></span> <span class="nav-text">Patterns 模式，一些固定的模式套路，一类特定的问题</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Growth-amp-communications-成长沟通，指的是培养用户"><span class="nav-number"></span> <span class="nav-text">Growth &amp; communications 成长沟通，指的是培养用户</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Usability-可用性"><span class="nav-number"></span> <span class="nav-text">Usability 可用性</span></a></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">clunyes</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/theme-next/hexo-theme-next">NexT.Pisces</a> v6.0.6</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.0.6"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.0.6"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=6.0.6"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=6.0.6"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.0.6"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.0.6"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.0.6"></script>
+
+
+
+  
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

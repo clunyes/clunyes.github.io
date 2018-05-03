@@ -1,0 +1,980 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.0.6" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.png?v=6.0.6">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.png?v=6.0.6">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.png?v=6.0.6">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.0.6" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '6.0.6',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  
+  <meta name="keywords" content="Hexo, NexT" />
+
+
+<meta name="description" content="android IPC 不得不提到AIDL，其余广播 bundle ContentProvider以及socket 其中又以AIDL最为关键（在android中就是这样）。 其中又有一个关键字Binder，在我理解看来Binder是一个桥梁。 下面演示下binder，按照android开发艺术探索的指引，生成IBookManager.java文件 /*  * This file is auto-g">
+<meta property="og:type" content="article">
+<meta property="og:title" content="AIDL的梳理">
+<meta property="og:url" content="http://clunyes.github.io/2017/02/20/android系统分析/AIDL的梳理/index.html">
+<meta property="og:site_name" content="clunyes_blog">
+<meta property="og:description" content="android IPC 不得不提到AIDL，其余广播 bundle ContentProvider以及socket 其中又以AIDL最为关键（在android中就是这样）。 其中又有一个关键字Binder，在我理解看来Binder是一个桥梁。 下面演示下binder，按照android开发艺术探索的指引，生成IBookManager.java文件 /*  * This file is auto-g">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2018-03-15T03:40:17.520Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="AIDL的梳理">
+<meta name="twitter:description" content="android IPC 不得不提到AIDL，其余广播 bundle ContentProvider以及socket 其中又以AIDL最为关键（在android中就是这样）。 其中又有一个关键字Binder，在我理解看来Binder是一个桥梁。 下面演示下binder，按照android开发艺术探索的指引，生成IBookManager.java文件 /*  * This file is auto-g">
+
+
+
+
+
+
+  <link rel="canonical" href="http://clunyes.github.io/2017/02/20/android系统分析/AIDL的梳理/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>AIDL的梳理 | clunyes_blog</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"> 
+
+<div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">clunyes_blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+          
+  <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />Home</a>
+</li>
+
+      
+        
+        
+          
+  <li class="menu-item menu-item-about">
+    <a href="/about/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-user"></i> <br />About</a>
+</li>
+
+      
+        
+        
+          
+  <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />Archives</a>
+</li>
+
+      
+
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+  
+
+
+
+ </div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://clunyes.github.io/2017/02/20/android系统分析/AIDL的梳理/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="clunyes">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="clunyes_blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">AIDL的梳理</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-02-20T18:06:36+08:00">2017-02-20</time>
+            
+
+            
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>android IPC 不得不提到AIDL，其余广播 bundle ContentProvider以及socket</p>
+<p>其中又以AIDL最为关键（在android中就是这样）。</p>
+<p>其中又有一个关键字Binder，在我理解看来Binder是一个桥梁。</p>
+<p>下面演示下binder，按照android开发艺术探索的指引，生成IBookManager.java文件</p>
+<pre><code>/*
+ * This file is auto-generated.  DO NOT MODIFY.
+ * Original file: E:\\workspace_study\\ZKTestProject\\app\\src\\main\\aidl\\com\\zhaokang\\zktestproject\\IBookManager.aidl
+ */
+package com.zhaokang.zktestproject;
+
+public interface IBookManager extends android.os.IInterface {
+    /**
+     * Local-side IPC implementation stub class.
+     */
+    public static abstract class Stub extends android.os.Binder implements com.zhaokang.zktestproject.IBookManager {
+        private static final java.lang.String DESCRIPTOR = &quot;com.zhaokang.zktestproject.IBookManager&quot;;
+
+        /**
+         * Construct the stub at attach it to the interface.
+         */
+        public Stub() {
+            this.attachInterface(this, DESCRIPTOR);
+        }
+
+        /**
+         * Cast an IBinder object into an com.zhaokang.zktestproject.IBookManager interface,
+         * generating a proxy if needed.
+         */
+        public static com.zhaokang.zktestproject.IBookManager asInterface(android.os.IBinder obj) {
+            if ((obj == null)) {
+                return null;
+            }
+            android.os.IInterface iin = obj.queryLocalInterface(DESCRIPTOR);
+            if (((iin != null) &amp;&amp; (iin instanceof com.zhaokang.zktestproject.IBookManager))) {
+                return ((com.zhaokang.zktestproject.IBookManager) iin);
+            }
+            return new com.zhaokang.zktestproject.IBookManager.Stub.Proxy(obj);
+        }
+
+        @Override
+        public android.os.IBinder asBinder() {
+            return this;
+        }
+
+        @Override
+        public boolean onTransact(int code, android.os.Parcel data, android.os.Parcel reply, int flags) throws android.os.RemoteException {
+            switch (code) {
+                case INTERFACE_TRANSACTION: {
+                    reply.writeString(DESCRIPTOR);
+                    return true;
+                }
+                case TRANSACTION_getBookList: {
+                    data.enforceInterface(DESCRIPTOR);
+                    java.util.List&lt;com.zhaokang.zktestproject.Book&gt; _result = this.getBookList();
+                    reply.writeNoException();
+                    reply.writeTypedList(_result);
+                    return true;
+                }
+                case TRANSACTION_addBook: {
+                    data.enforceInterface(DESCRIPTOR);
+                    com.zhaokang.zktestproject.Book _arg0;
+                    if ((0 != data.readInt())) {
+                        _arg0 = com.zhaokang.zktestproject.Book.CREATOR.createFromParcel(data);
+                    } else {
+                        _arg0 = null;
+                    }
+                    this.addBook(_arg0);
+                    reply.writeNoException();
+                    return true;
+                }
+            }
+            return super.onTransact(code, data, reply, flags);
+        }
+
+        private static class Proxy implements com.zhaokang.zktestproject.IBookManager {
+            private android.os.IBinder mRemote;
+
+            Proxy(android.os.IBinder remote) {
+                mRemote = remote;
+            }
+
+            @Override
+            public android.os.IBinder asBinder() {
+                return mRemote;
+            }
+
+            public java.lang.String getInterfaceDescriptor() {
+                return DESCRIPTOR;
+            }
+
+            @Override
+            public java.util.List&lt;com.zhaokang.zktestproject.Book&gt; getBookList() throws android.os.RemoteException {
+                android.os.Parcel _data = android.os.Parcel.obtain();
+                android.os.Parcel _reply = android.os.Parcel.obtain();
+                java.util.List&lt;com.zhaokang.zktestproject.Book&gt; _result;
+                try {
+                    _data.writeInterfaceToken(DESCRIPTOR);
+                    mRemote.transact(Stub.TRANSACTION_getBookList, _data, _reply, 0);
+                    _reply.readException();
+                    _result = _reply.createTypedArrayList(com.zhaokang.zktestproject.Book.CREATOR);
+                } finally {
+                    _reply.recycle();
+                    _data.recycle();
+                }
+                return _result;
+            }
+
+            @Override
+            public void addBook(com.zhaokang.zktestproject.Book book) throws android.os.RemoteException {
+                android.os.Parcel _data = android.os.Parcel.obtain();
+                android.os.Parcel _reply = android.os.Parcel.obtain();
+                try {
+                    _data.writeInterfaceToken(DESCRIPTOR);
+                    if ((book != null)) {
+                        _data.writeInt(1);
+                        book.writeToParcel(_data, 0);
+                    } else {
+                        _data.writeInt(0);
+                    }
+                    mRemote.transact(Stub.TRANSACTION_addBook, _data, _reply, 0);
+                    _reply.readException();
+                } finally {
+                    _reply.recycle();
+                    _data.recycle();
+                }
+            }
+        }
+
+        static final int TRANSACTION_getBookList = (android.os.IBinder.FIRST_CALL_TRANSACTION + 0);
+        static final int TRANSACTION_addBook = (android.os.IBinder.FIRST_CALL_TRANSACTION + 1);
+    }
+
+    public java.util.List&lt;com.zhaokang.zktestproject.Book&gt; getBookList() throws android.os.RemoteException;
+
+    public void addBook(com.zhaokang.zktestproject.Book book) throws android.os.RemoteException;
+}
+</code></pre><hr>
+<p>再贴下service的代码<br>    package com.zhaokang.zktestproject;</p>
+<pre><code>import android.app.Service;
+import android.content.Intent;
+import android.os.Binder;
+import android.os.IBinder;
+import android.os.RemoteCallbackList;
+import android.os.RemoteException;
+import android.os.SystemClock;
+import android.util.Log;
+
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.atomic.AtomicBoolean;
+
+public class BookManagerService extends Service {
+
+    private static final String TAG = &quot;BMS&quot;;
+
+    private AtomicBoolean mIsServiceDestroyed = new AtomicBoolean(false);
+
+    private CopyOnWriteArrayList&lt;Book&gt; mBookList = new CopyOnWriteArrayList&lt;&gt;();
+
+    private RemoteCallbackList&lt;IOnNewBookArrivedListener&gt; mListenerList = new RemoteCallbackList&lt;&gt;();
+
+    private Binder mBinder = new IBookManager.Stub() {
+
+        @Override
+        public List&lt;Book&gt; getBookList() throws RemoteException {
+//            SystemClock.sleep(5000);
+            return mBookList;
+        }
+
+        @Override
+        public void addBook(Book book) throws RemoteException {
+            mBookList.add(book);
+        }
+
+        @Override
+        public void registerListener(IOnNewBookArrivedListener listener) throws RemoteException {
+//            if (!mListenerList.contains(listener)) {
+//                mListenerList.add(listener);
+//            } else {
+//                Log.i(TAG, &quot;already exist&quot;);
+//            }
+//            Log.i(TAG, &quot;registerListener, size = &quot; + mListenerList.size());
+            mListenerList.register(listener);
+        }
+
+        @Override
+        public void unRegisterListener(IOnNewBookArrivedListener listener) throws RemoteException {
+//            if (mListenerList.contains(listener)) {
+//                mListenerList.remove(listener);
+//                Log.i(TAG, &quot;unRegisterListener success&quot;);
+//            } else {
+//                Log.i(TAG, &quot;unRegisterListener fail&quot;);
+//            }
+//            Log.i(TAG, &quot;unRegisterListener, size = &quot; + mListenerList.size());
+            mListenerList.unregister(listener);
+        }
+    };
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        mBookList.add(new Book(1, &quot;android&quot;));
+        mBookList.add(new Book(2, &quot;ios&quot;));
+        new Thread(new ServiceWorker()).start();
+    }
+
+    @Override
+    public IBinder onBind(Intent intent) {
+        return mBinder;
+    }
+
+    private void onNewBookArrived(Book book) throws RemoteException {
+        mBookList.add(book);
+//        Log.i(TAG, &quot;onNewBookArrived notify listeners&quot; + mListenerList.size());
+        final int N = mListenerList.beginBroadcast();
+        for (int i = 0; i &lt; N; i++) {
+            IOnNewBookArrivedListener listener = mListenerList.getBroadcastItem(i);
+            Log.d(TAG, &quot;onNewBookArrived notify listener&quot; + listener);
+            listener.onNewBookArrived(book);
+        }
+    }
+
+    private class ServiceWorker implements Runnable {
+
+        @Override
+        public void run() {
+            while (!mIsServiceDestroyed.get()) {
+                try {
+                    Thread.sleep(5000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                int bookId = mBookList.size() + 1;
+                Book newBook = new Book(bookId, &quot;new Book#&quot; + bookId);
+                try {
+                    onNewBookArrived(newBook);
+                } catch (RemoteException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+}
+</code></pre><p>stub就是binder类</p>
+<pre><code>DESCRIPTOR是binder类名
+
+asInterface(android.os.IBinder obj)将服务端binder转换成客户端需要的接口类型，如果是同进程，返回stub，如果跨进程返回
+proxy。
+
+asBinder 返回binder
+
+onTransact  public boolean onTransact(int code, android.os.Parcel data, android.os.Parcel reply, int flags) 
+该方法运行在服务端的线程池中。
+transact翻译来是处理 当客户端发出ipc请求，最终由该方法处理，根据code来判断调用哪个方法，从data中取出数据，用reply返回数据。
+如果该方法返回false，客户端的请求会失败。
+
+Proxy#getBookList java.util.List&lt;com.zhaokang.zktestproject.Book&gt; getBookList() 创建data，reply，和最后的返回list
+
+ if ((book != null)) {
+    _data.writeInt(1);
+     book.writeToParcel(_data, 0);
+    } else {
+         _data.writeInt(0);
+    }
+    。。。
+ }
+
+如果有参数，就放入data，随后调用服务端的onTransact，同时当前线程挂起，等到onTransact返回reply，随后返回reply的数据
+
+注意点
+
+1. 客户端发起请求后线程会挂起，为了防止影响ui线程，建议在子线程中发起请求。（客户端服务端道理相同）
+2. onTransact运行在线程池中，所以必须用同步的方式去执行。
+</code></pre><hr>
+<pre><code>以上是binder的分析
+
+aidl完全是根据binder的封装的
+
+需要注意的点，两端如果某方法耗时，那么调用方需要在子线程中调用
+
+解绑接口时要使用RemoteCallbckList，由该类来维护所有的进程间接口
+
+服务进程意外断掉的情况，在serviceDisconnected中重连服务，或者给binder设置死亡代理DeathRecipient，重连服务，
+我感觉前者比较好用
+
+aidl权限验证：在onBind方法中permission验证，在onTransact方法中permission验证，其余还有包名验证等。
+</code></pre>
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/02/08/android系统分析/android面试分享/" rel="next" title="android面试分享">
+                <i class="fa fa-chevron-left"></i> android面试分享
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/02/22/android热修复原理/" rel="prev" title="android热修复原理">
+                android热修复原理 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+
+      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/avatar.png"
+                alt="clunyes" />
+            
+              <p class="site-author-name" itemprop="name">clunyes</p>
+              <p class="site-description motion-element" itemprop="description">好想去看dac</p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">54</span>
+                    <span class="site-state-item-name">posts</span>
+                  </a>
+                </div>
+              
+
+              
+
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">clunyes</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/theme-next/hexo-theme-next">NexT.Pisces</a> v6.0.6</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.0.6"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.0.6"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=6.0.6"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=6.0.6"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.0.6"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.0.6"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.0.6"></script>
+
+
+
+  
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

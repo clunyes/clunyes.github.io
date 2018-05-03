@@ -1,0 +1,965 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.0.6" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.png?v=6.0.6">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.png?v=6.0.6">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.png?v=6.0.6">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.0.6" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '6.0.6',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  
+  <meta name="keywords" content="Hexo, NexT" />
+
+
+<meta name="description" content="首先感谢各个公司给了我面试的机会 这段时间在看机会，去了几个面试，把面试到的题目和大家分享一下  某AI公司，面试官非常有耐心，人非常好（好想跟他混。。。） oauth2.0授权的流程 第三方应用去服务商获取app secret （A）用户打开客户端以后，客户端要求用户给予授权—–跳至服务商页面。  （B）如果用户同意，那么登录，根据用户登录信息和app secret，服务商同意给予客户端授权ac">
+<meta property="og:type" content="article">
+<meta property="og:title" content="android面试分享">
+<meta property="og:url" content="http://clunyes.github.io/2017/02/08/android系统分析/android面试分享/index.html">
+<meta property="og:site_name" content="clunyes_blog">
+<meta property="og:description" content="首先感谢各个公司给了我面试的机会 这段时间在看机会，去了几个面试，把面试到的题目和大家分享一下  某AI公司，面试官非常有耐心，人非常好（好想跟他混。。。） oauth2.0授权的流程 第三方应用去服务商获取app secret （A）用户打开客户端以后，客户端要求用户给予授权—–跳至服务商页面。  （B）如果用户同意，那么登录，根据用户登录信息和app secret，服务商同意给予客户端授权ac">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://clunyes.github.io/2017/images/lifecycle.png">
+<meta property="og:image" content="http://clunyes.github.io/2017/images/socket主流程.png">
+<meta property="og:updated_time" content="2018-03-15T03:40:17.526Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="android面试分享">
+<meta name="twitter:description" content="首先感谢各个公司给了我面试的机会 这段时间在看机会，去了几个面试，把面试到的题目和大家分享一下  某AI公司，面试官非常有耐心，人非常好（好想跟他混。。。） oauth2.0授权的流程 第三方应用去服务商获取app secret （A）用户打开客户端以后，客户端要求用户给予授权—–跳至服务商页面。  （B）如果用户同意，那么登录，根据用户登录信息和app secret，服务商同意给予客户端授权ac">
+<meta name="twitter:image" content="http://clunyes.github.io/2017/images/lifecycle.png">
+
+
+
+
+
+
+  <link rel="canonical" href="http://clunyes.github.io/2017/02/08/android系统分析/android面试分享/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>android面试分享 | clunyes_blog</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"> 
+
+<div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">clunyes_blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+          
+  <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />Home</a>
+</li>
+
+      
+        
+        
+          
+  <li class="menu-item menu-item-about">
+    <a href="/about/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-user"></i> <br />About</a>
+</li>
+
+      
+        
+        
+          
+  <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />Archives</a>
+</li>
+
+      
+
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+  
+
+
+
+ </div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://clunyes.github.io/2017/02/08/android系统分析/android面试分享/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="clunyes">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="clunyes_blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">android面试分享</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-02-08T17:31:32+08:00">2017-02-08</time>
+            
+
+            
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <pre><code>首先感谢各个公司给了我面试的机会
+</code></pre><p>这段时间在看机会，去了几个面试，把面试到的题目和大家分享一下</p>
+<h3 id="某AI公司，面试官非常有耐心，人非常好（好想跟他混。。。）"><a href="#某AI公司，面试官非常有耐心，人非常好（好想跟他混。。。）" class="headerlink" title=" 某AI公司，面试官非常有耐心，人非常好（好想跟他混。。。）"></a><font color="af8888"> 某AI公司，面试官非常有耐心，人非常好（好想跟他混。。。）</font></h3><ol>
+<li><p>oauth2.0授权的流程<br> 第三方应用去服务商获取app secret<br> （A）用户打开客户端以后，客户端要求用户给予授权—–跳至服务商页面。</p>
+<p> （B）如果用户同意，那么登录，根据用户登录信息和app secret，服务商同意给予客户端授权accessToken。</p>
+<p> （C）客户端使用上一步获得的授权accessToken，向资源服务器申请获取资源。</p>
+<p> （D）资源服务器确认令牌无误，返回该accessToken的相关数据。</p>
+</li>
+<li><p><a href="http://clunyes.github.io/2017/03/03/java深入学习/jni浅析/">jni调用</a>.</p>
+</li>
+<li><p>IPC AIDL的简单实现<br>IPC的各种方式 广播 AIDL Messenger bundle ContentProvider以及socket<br> 要理解aidl要首先理解binder<br> Binder是什么：binder连接前台应用和service的桥梁<br> <a href="http://clunyes.github.io/2017/02/20/android系统分析/AIDL的梳理/">具体aidl怎么实现</a>.</p>
+</li>
+<li><p>tcp长连接</p>
+<p> 采用心跳包来keep-alive<br> keep-alive ：一个连接在２小时内没有任何动作，服务器就向客户机发送一个探测报文，对于客户机：</p>
+<pre><code>(1)正常运行，并从服务器可达，TCP响应正常，保活定时器复位(再次获得２小时)
+(2)客户机崩溃,关闭或者正在重启，TCP无响应，75秒后超时，服务器稍后发送9个探测报文(共计１０个)，间隔都为75秒。TCP都没有响应，认为客户机已经关闭连接
+(3)客户机崩溃并重启完成：服务器将收到一个探测响应，这个响应是一个复位，使得服务器终止这个连接。
+(4)客户机正常运行，但是服务器不可达，探测无响应，10次探测后无响应，关闭
+</code></pre></li>
+<li><p>git命令，git rebase</p>
+<p> 因为公司的原因一直在用svn，git都是我个人在玩。所以对于这个问题，还是一脸懵逼，看来还是要多学习。</p>
+</li>
+<li><p>surfaceView的特性</p>
+<p> SurfaceView和View最本质的区别在于，surfaceView是在一个新起的单独线程中，可以重新绘制画面（双缓冲绘制）而View必须在UI的主线程中更新画面。</p>
+<p> SurfaceView控件适合内存耗费大、需要频繁刷新的场景，常用于显示游戏、动画、视频等。</p>
+<p> 两个重要方法lockCanvas；unlockCanvasAndPost<br> ps什么叫双缓冲：SurfaceView内部会有两块Buffer。调用lockCanvas之后，便可以在bufferA上绘图了。绘完之后，调用unlockCanvasAndPost将bufferA显示再屏幕上，<br> 随后调用lockCanvas，在bufferB上绘图，调用unlockCanvasAndPost将bufferB显示在屏幕上。repeat。</p>
+</li>
+<li><p>httpdns</p>
+<p> httpdns和dns有什么差别<br> httpdns基于http协议<br> httpdns：httpdns使用HTTP协议进行域名解析，代替现有基于udp的dns协议</p>
+<p> httpdns优势：防劫持，精准调度，使用场景也是app居多。<br> 下一个问题，怎么用httpdns–阿里云就提供了，但是要按流量收费。</p>
+</li>
+<li><p>art dalvik的区别</p>
+<p> art采用预加载机制，在apk安装时就编译完成，占用空间更多一些。dalvik是动态编译，每次启动都要编译。<br> gc方面，dalvik是同步的，art是部分异步。</p>
+</li>
+<li><p>事件分发</p>
+<p> 三个关键方法：dispatchTouchEvent 是否消耗当前事件<br> onInterceptTouchEvent 是否拦截当前事件<br> onTouchEvent 是否消耗当前事件</p>
+<p> 那么这三个方法有啥关系呢</p>
+<pre><code>public  boolean dispatchTouchEvent(MotionEvent ev){
+    boolean consume = false;
+    if(onInterceptTouchEvent(ev)){
+        consume = onTouchEvent(ev);
+    } else{
+        consume = child.dispatchTouchEvent(ev);
+    }
+    return consume;
+}
+</code></pre><p> 有些要点需要记住，一个事件序列只能被一个view消耗，</p>
+<p> 如果一个事件没有view去处理，那么事件会交给activity处理</p>
+<p> ViewGroup的onInterceptTouchEvent默认不调用</p>
+<p> view没有onInterceptTouchEvent的方法</p>
+<p> 事件传递是由activity–window–view。</p>
+</li>
+<li><p>layout绘制流程</p>
+<p>activity attach方法，创建window建立关联。setContentView</p>
+<ol>
+<li>如果没有DecorView就创建一个（DecorView包含标题栏和内容栏（经大神验证，标题栏不是状态栏statusBar））</li>
+<li>将你的xml，添加到decorView的内容栏contentPatent（R.id.content）</li>
+<li>activity回调onContentChanged</li>
+<li>最后在onResume中调用makeVisible</li>
+</ol>
+<p>结构就是DecorView–&gt; ViewGroup（DecorView的内容栏）–&gt; 你的View。</p>
+<p>说道这里，必须说一下activity window和view的故事</p>
+<pre><code>我们知道view是视图，但是android中view不能单独存在，他必须依附于window之上，window就是负责展示view的。
+activity负责控制window的行为，同时window的结果都会回调给activity。
+那么view和window是怎么bind起来的呢，通过ViewRootImpl，它就是window和view交互的桥梁。
+</code></pre></li>
+<li><p>jvm</p>
+<p>详见 <a href="http://www.jianshu.com/p/54eb60cfa7bd" target="_blank" rel="noopener">http://www.jianshu.com/p/54eb60cfa7bd</a></p>
+</li>
+<li><p>内存泄漏</p>
+<pre><code>推荐一个很好的文章https://medium.com/freenet-engineering/memory-leaks-in-android-identify-treat-and-avoid-d0b1233acc8#.tny5y511b
+说明了几种容易泄漏的点，归总也就是一点activity或者fragment中不要有超过本身生命周期的引用，
+否则activity（fragment）无法被回收。
+
+1服务不关，2内部类（网络请求的），3匿名类（也是网络请求） 网络请求，退出务必关闭回收或者取消。
+异步线程对控件等用弱引用的方式引用
+
+depth是0的就是泄漏的
+
+文章最后给出了一些建议，关于多线程其实rxjava是非常好的解决方案。
+</code></pre></li>
+</ol>
+<h3 id="某宝公司的电话面试"><a href="#某宝公司的电话面试" class="headerlink" title=" 某宝公司的电话面试"></a><font color="af8888"> 某宝公司的电话面试</font></h3><ol>
+<li><p>android生命周期介绍</p>
+<p> onCreate<br> onRestart activity从不可见状态切换成可见状态<br> onStart activity已经可见了，但是还在后台<br> onResume activity可见了<br> onPause activity还是可见的，但是不能交互了<br> onStop activity不可见<br> onDestroy</p>
+<p> onPause和onStop一般一起触发</p>
+</li>
+<li><p>activity的四种启动模式</p>
+<p> 先介绍两个概念task和taskAffinity，</p>
+<pre><code>task：翻译过来就是“任务”，是一组相互有关联的 activity 集合，可以理解为 Activity 是在 task 里面活动的。 
+task 存在于一个称为 back stack 的数据结构中，也就是说， task 是以栈的形式去管理 activity 的，
+所以也叫可以称为“任务栈”。
+taskAffinity：官方文档解释是：&quot;The task that the activity has an affinity for.&quot;，
+可以翻译为 activity 相关或者亲和的任务，这个参数标识了一个 Activity 所需要的任务栈的名字。
+默认情况下，所有Activity所需的任务栈的名字为应用的包名。 taskAffinity 属性主要和 singleTask 
+启动模式或者 allowTaskReparenting 属性配对使用。
+</code></pre><p> 正常standard启动模式的activity默认会进入应用报名所属的任务栈中</p>
+<p> standard 默认 重新创建</p>
+<p> singleTop 栈顶复用，如果栈顶就是这个Activity，那么onNewIntent会被调用</p>
+<p> singleTask 栈内复用，在第一次启动这个 Activity 时，系统便会创建一个新的任务，taskAffinity 属性是和 singleTask 模式搭配使用的。<br> 。如果再次调用会弹出目标activity之上的其余activity，回调onNewIntent。还有个特殊参数allowTaskReparenting，如果是true，会转移任务栈。</p>
+<p> singleInstance 单独占用一个栈，其余与singleTask一致</p>
+</li>
+<li><p>远程service的调用<br> localService和remoteService,就是上文的ipc</p>
+</li>
+<li><p>activity和fragment的区别，fragment的优势<br> fragment对比activity更灵活，fragment轻量级，更加易于管理，易于适配手机和平板。</p>
+<p> 生命周期如下图：<br> <img src="/2017/02/08/android系统分析/android面试分享/../../../../images/lifecycle.png" alt=""></p>
+</li>
+<li><p>最满意的模块和其中使用的设计模式<br> 恩。。</p>
+</li>
+<li><p>https</p>
+<p> http + tls/ssl </p>
+</li>
+</ol>
+<h2 id="单独说一下looper-handler"><a href="#单独说一下looper-handler" class="headerlink" title="单独说一下looper handler"></a>单独说一下looper handler</h2><ul>
+<li>每一个线程有一个Looper，looper内部有一个mq</li>
+<li>handler有它的特性，handler可以在任意线程发送消息，handler发送的消息都会发送到它关联的looper的mq中<br>（handler的创建会关联一个looper，如果不设置默认是当前线程的looper）</li>
+<li>looper会轮询自己的mq来处理消息，交给handler的handleMessage去处理。</li>
+</ul>
+<p>Looper.loop() looper开始工作</p>
+<p><a href="http://clunyes.github.io/2017/02/27/java深入学习/javaThread状态/">深入探讨下线程</a>.</p>
+<p><a href="http://clunyes.github.io/2017/02/28/java深入学习/java线程池/">java线程池</a>.</p>
+<h3 id="某怡科技面试，android负责人技术还行，感觉是对着android开发艺术探索来面的，不过这本书确实经典"><a href="#某怡科技面试，android负责人技术还行，感觉是对着android开发艺术探索来面的，不过这本书确实经典" class="headerlink" title=" 某怡科技面试，android负责人技术还行，感觉是对着android开发艺术探索来面的，不过这本书确实经典"></a><font color="af8888"> 某怡科技面试，android负责人技术还行，</font>感觉是对着android开发艺术探索来面的，不过这本书确实经典</h3><ol>
+<li><p>线程池具体实现有哪几种</p>
+<p> FixedThreadPool   线程池固定的线程池<br> CachedThreadPool  线程数上限很大，一有任务就会执行，终止并从缓存中移除那些已有 60 秒钟未被使用的线程。<br> 全部闲置时，线程全部停止，此时线程池不占用内存<br> ScheduledThreadPool  核心线程数固定，非核心线程数目不固定，闲置就会回收。适用于执行定时任务，固定周期的任务。<br> SingleThreadExecutor 单个线程的线程池，是同步的</p>
+</li>
+<li><p>onMeasure参数意义<br> MeasureSpec 32位的值，高2位是SpecMode，低30位是SpecSize</p>
+<p> SpecMode为</p>
+<p> UNSPECIFIED 父容器不对view有任何限制</p>
+<p> EXACTLY 父容器已经检测出view所需要的具体大小，最终大小就是specSize</p>
+<p> AT_MOLT 父容器指定了一个可用的specSize，view的大小不能超过这个specSize</p>
+<p> LayoutParam和父容器一起决定MeasureSpec:</p>
+<p> layoutParam.match_parent 大小就是窗口大小</p>
+<p> layoutParam.wrap_content 大小不定，不能超过窗口大小</p>
+<p> 100dp固定大小：为layoutParam指定的大小 </p>
+<p> 以上为基础知识</p>
+<p> 子元素measureSpec创建和父容器measureSpec和子元素本身的LayoutParam，还有子元素的margin padding有关系</p>
+<p> 在写自定义view时，自身大小为具体size,view的specMode都是EXACTLY为childSize，如果是match_content 那么不论是EXACTLY还是AT_MOST都是parentSize，<br> 如果要自身大小为wrap_content，则需要重写onMeasure方法，因为在wrap_content时，view的specMode都是AT_MOST，即会填满父控件，这不是我们想要得效果<br> 如何重写，在onMeasure中判断AT_MOST，将宽高用默认宽高代替。</p>
+</li>
+<li><p>自定义绘图，旋转</p>
+<p> 采用matrix.setRotate的方式，matrix bitmap的关系？</p>
+</li>
+<li><p>图片3级缓存</p>
+<p> 网络缓存, 不优先加载, 速度慢,浪费流量<br> 本地缓存, 次优先加载, 速度快<br> 内存缓存, 优先加载, 速度最快</p>
+</li>
+<li><p>activity的启动过程</p>
+<p> <a href="http://clunyes.github.io/2017/02/24/android系统分析/activity启动和service启动/">详细说明</a></p>
+</li>
+<li><p>IntentService<br> service是运行在主线程中的，所以service是不能进行耗时操作的<br> 可以执行耗时的任务的service，内部实现是HandlerThread和handler。HandlerThread是一个有Looper的Thread。<br> 正是由于HandlerThread，IntentService可以进行耗时操作，处理完所有逻辑之后，会自动关闭服务！（这么厉害的东西，之前都没用过）</p>
+</li>
+<li><p>图片缓存回收的算法    </p>
+<pre><code>1. 新数据插入到链表头部；
+
+2. 每当缓存命中（即缓存数据被访问），则将数据移到链表头部；
+
+3. 当链表满的时候，将链表尾部的数据丢弃。
+</code></pre><p> LRU，最近最少使用算法<br> LruCache是由LinkedHashMap来实现的，同步实现（因为是不同线程调用的）。</p>
+<p> 图片缓存的是drawable。</p>
+</li>
+<li><p>并发场景，争夺资源</p>
+<p> <a href="http://clunyes.github.io/2017/03/01/java深入学习/java线程安全/">synchronized</a></p>
+</li>
+</ol>
+<h3 id="扩展问题"><a href="#扩展问题" class="headerlink" title=" 扩展问题"></a><font color="af8888"> 扩展问题</font></h3><ol>
+<li><p>数据结构有哪些</p>
+<pre><code>1. 逻辑结构分为:集合结构；线性结构；树形结构；图形结构
+2. 物理（计算机存储）结构：顺序存储结构，数组；链式存储结构，链表
+</code></pre><p>数组 String[] 包括列表</p>
+<p>链表 LinkedList</p>
+<p>栈 activity task 就是一个栈，先进后出</p>
+<p>队列  基本上，一个队列就是一个先入先出（FIFO）的数据结构</p>
+<p>树</p>
+<p>图</p>
+</li>
+<li><p>java  copyOnWrite思路，<br> <a href="http://clunyes.github.io/2017/02/28/java深入学习/java集合理解/">各种集合类的实现</a></p>
+</li>
+<li><p><a href="http://clunyes.github.io/2017/02/22/android热修复原理/">android 热修复原理</a></p>
+</li>
+<li><p>android保活</p>
+<ol>
+<li><p>不同app利用广播相互唤醒</p>
+</li>
+<li><p>开启前台服务，不显示notification–这种方式还是会被杀死的</p>
+</li>
+<li><p>如果够牛逼，进入系统的白名单</p>
+</li>
+<li><p>一个像素的activity</p>
+</li>
+<li><p>JobScheduler（有待验证怎么使用的）</p>
+<p>进程回收机制：系统内存不足的情况下android会开始杀进程，所使用的机制就是Low Memory Killer。</p>
+<p>oom_adj值越低越不会被杀死</p>
+<p>app退到后台时，其所有的进程优先级都会降低。但是UI进程是降低最为明显的，因为它占用的内存资源最多，<br>系统内存不足的时候肯定优先杀这些占用内存高的进程来腾出资源。所以，为了尽量避免后台UI进程被杀，<br>需要尽可能的释放一些不用的资源，尤其是图片、音视频之类的。</p>
+<p>目前来讲，app进入到后台后，如果资源紧张肯定会被kill。</p>
+</li>
+</ol>
+</li>
+<li><p>生产者消费者模式</p>
+</li>
+<li><p>android优化</p>
+<ol>
+<li>内存泄漏方面</li>
+<li>ui视图绘制慢导致卡顿</li>
+<li>严苛模式</li>
+<li>启动优化–不必要在application中初始化的代码，放到ui初始化完成后。</li>
+</ol>
+</li>
+<li><p>socket的基本流程<br> <img src="/2017/02/08/android系统分析/android面试分享/../../../../images/socket主流程.png" alt=""></p>
+</li>
+</ol>
+<h3 id="唯X科技面试，有一句说一句，面试官是架构师技术非常不错，人很谦和，"><a href="#唯X科技面试，有一句说一句，面试官是架构师技术非常不错，人很谦和，" class="headerlink" title=" 唯X科技面试，有一句说一句，面试官是架构师技术非常不错，人很谦和，"></a><font color="af8888"> 唯X科技面试，</font>有一句说一句，面试官是架构师技术非常不错，人很谦和，</h3><p>面试官表示我还是个中级。哎，慢慢面吧。</p>
+<ol>
+<li><p>android ndk 开发</p>
+</li>
+<li><p>对于android framework的理解</p>
+</li>
+<li><p>源码要自己敲一遍，理解更加深刻</p>
+</li>
+<li><p>app启动时间优化 adb shell am start -W cn.mynewclouedeu/cn.mynewclouedeu.ui.activity.ActivityGuide<br>查出启动时间，application初始化使用线程操作。</p>
+</li>
+<li><p>java与模式，理解低耦合高内聚</p>
+</li>
+<li><p>动态注册广播比静态注册广播先收到广播</p>
+</li>
+<li><p>图片压缩，高清晰度，仿微信</p>
+</li>
+<li><p>aop 面向切面编程</p>
+</li>
+<li><p>增量更新</p>
+</li>
+<li><p>注解的理解</p>
+</li>
+</ol>
+<p>这道问题非常考验功力，慢慢修炼。</p>
+<h3 id="X联动力面试，面试流程比较奇葩的，提了个需求问行不行"><a href="#X联动力面试，面试流程比较奇葩的，提了个需求问行不行" class="headerlink" title=" X联动力面试，面试流程比较奇葩的，提了个需求问行不行"></a><font color="af8888"> X联动力面试，</font>面试流程比较奇葩的，提了个需求问行不行</h3><ol>
+<li><p>需要要和硬件打交道（jni hal你都得会）</p>
+</li>
+<li><p>自己公司有自己的视频流协议（视频流的协议，通信协议你得熟悉）</p>
+</li>
+<li><p>要做android app开发（app相关你也得过关）</p>
+</li>
+</ol>
+<p>要求还是挺高的，如果去做的话对于我这样的工程师估计够呛。</p>
+<p>顺利的面试我就不发了，目标还是定在大厂，不是大厂也得是大牛领导，实在是不想再去坑爹公司。   </p>
+<p>又发现了一个大牛的面经： <a href="http://www.jianshu.com/p/dea7c3555b3c" target="_blank" rel="noopener">http://www.jianshu.com/p/dea7c3555b3c</a>    ，不得不说基础很重要。</p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/01/22/rxjava/rxjava转换操作符/" rel="next" title="rxjava转换操作符">
+                <i class="fa fa-chevron-left"></i> rxjava转换操作符
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/02/20/android系统分析/AIDL的梳理/" rel="prev" title="AIDL的梳理">
+                AIDL的梳理 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/avatar.png"
+                alt="clunyes" />
+            
+              <p class="site-author-name" itemprop="name">clunyes</p>
+              <p class="site-description motion-element" itemprop="description">好想去看dac</p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">54</span>
+                    <span class="site-state-item-name">posts</span>
+                  </a>
+                </div>
+              
+
+              
+
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#某AI公司，面试官非常有耐心，人非常好（好想跟他混。。。）"><span class="nav-number">1.</span> <span class="nav-text"> 某AI公司，面试官非常有耐心，人非常好（好想跟他混。。。）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#某宝公司的电话面试"><span class="nav-number">2.</span> <span class="nav-text"> 某宝公司的电话面试</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#单独说一下looper-handler"><span class="nav-number"></span> <span class="nav-text">单独说一下looper handler</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#某怡科技面试，android负责人技术还行，感觉是对着android开发艺术探索来面的，不过这本书确实经典"><span class="nav-number">1.</span> <span class="nav-text"> 某怡科技面试，android负责人技术还行，感觉是对着android开发艺术探索来面的，不过这本书确实经典</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#扩展问题"><span class="nav-number">2.</span> <span class="nav-text"> 扩展问题</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#唯X科技面试，有一句说一句，面试官是架构师技术非常不错，人很谦和，"><span class="nav-number">3.</span> <span class="nav-text"> 唯X科技面试，有一句说一句，面试官是架构师技术非常不错，人很谦和，</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#X联动力面试，面试流程比较奇葩的，提了个需求问行不行"><span class="nav-number">4.</span> <span class="nav-text"> X联动力面试，面试流程比较奇葩的，提了个需求问行不行</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">clunyes</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/theme-next/hexo-theme-next">NexT.Pisces</a> v6.0.6</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.0.6"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.0.6"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=6.0.6"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=6.0.6"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.0.6"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.0.6"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.0.6"></script>
+
+
+
+  
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
