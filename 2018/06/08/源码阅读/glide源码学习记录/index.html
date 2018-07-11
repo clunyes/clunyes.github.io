@@ -103,24 +103,24 @@
   <meta name="keywords" content="Hexo, NexT" />
 
 
-<meta name="description" content="##Builder模式 典型的builder，android的dialog">
+<meta name="description" content="preconditions: 优雅的参数检测，以后项目可以用 单例 public static Glide get(@NonNull Context context) {      if (glide == null) {        synchronized (Glide.class) {          if (glide == null) {            checkAndIn">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Builder模式">
-<meta property="og:url" content="http://clunyes.github.io/2017/02/28/设计模式/创建型/Builder模式/index.html">
+<meta property="og:title" content="glide源码学习记录">
+<meta property="og:url" content="http://clunyes.github.io/2018/06/08/源码阅读/glide源码学习记录/index.html">
 <meta property="og:site_name" content="clunyes_blog">
-<meta property="og:description" content="##Builder模式 典型的builder，android的dialog">
+<meta property="og:description" content="preconditions: 优雅的参数检测，以后项目可以用 单例 public static Glide get(@NonNull Context context) {      if (glide == null) {        synchronized (Glide.class) {          if (glide == null) {            checkAndIn">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2018-03-15T03:40:17.623Z">
+<meta property="og:updated_time" content="2018-06-08T08:22:30.289Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Builder模式">
-<meta name="twitter:description" content="##Builder模式 典型的builder，android的dialog">
+<meta name="twitter:title" content="glide源码学习记录">
+<meta name="twitter:description" content="preconditions: 优雅的参数检测，以后项目可以用 单例 public static Glide get(@NonNull Context context) {      if (glide == null) {        synchronized (Glide.class) {          if (glide == null) {            checkAndIn">
 
 
 
 
 
 
-  <link rel="canonical" href="http://clunyes.github.io/2017/02/28/设计模式/创建型/Builder模式/"/>
+  <link rel="canonical" href="http://clunyes.github.io/2018/06/08/源码阅读/glide源码学习记录/"/>
 
 
 
@@ -130,7 +130,7 @@
   };
 </script>
 
-  <title>Builder模式 | clunyes_blog</title>
+  <title>glide源码学习记录 | clunyes_blog</title>
   
 
 
@@ -288,7 +288,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://clunyes.github.io/2017/02/28/设计模式/创建型/Builder模式/">
+    <link itemprop="mainEntityOfPage" href="http://clunyes.github.io/2018/06/08/源码阅读/glide源码学习记录/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="clunyes">
@@ -305,7 +305,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">Builder模式</h1>
+          <h1 class="post-title" itemprop="name headline">glide源码学习记录</h1>
         
 
         <div class="post-meta">
@@ -317,7 +317,7 @@
               
                 <span class="post-meta-item-text">Posted on</span>
               
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-02-28T16:03:40+08:00">2017-02-28</time>
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-06-08T09:04:12+08:00">2018-06-08</time>
             
 
             
@@ -354,9 +354,60 @@
       
 
       
-        <p>##Builder模式</p>
-<pre><code>典型的builder，android的dialog
-</code></pre>
+        <ol>
+<li>preconditions: 优雅的参数检测，以后项目可以用</li>
+<li><p>单例</p>
+<pre><code>public static Glide get(@NonNull Context context) {
+     if (glide == null) {
+       synchronized (Glide.class) {
+         if (glide == null) {
+           checkAndInitializeGlide(context);
+         }
+       }
+     }
+    return glide;
+  }
+</code></pre></li>
+<li><p>泛型使用<br>源码中大量使用了泛型，以及泛型方法，泛型接口，泛型类</p>
+<p>  E - Element (在集合中使用，因为集合中存放的是元素)</p>
+<p>  T - Type（Java 类）， S、U、V  - 2nd、3rd、4th types</p>
+<p>  K - Key（键）</p>
+<p>  V - Value（值）</p>
+<p>  N - Number（数值类型）</p>
+<p> ？ -  通配符</p>
+</li>
+<li><p>分包</p>
+<pre><code>glide的包分为
+load：加载和解码
+manager：生命周期控制
+module
+provider
+request：加载图片的请求
+signature：
+util
+以及默认包
+</code></pre><p>分包比较简练，对外提供简单的接口，比较好懂。内部代码严谨，比较规范。</p>
+</li>
+<li><p>glide的初始化比较简单：</p>
+<pre><code>通过AndroidManifest和@GlideModule注解获取用户自定义配置GlideModule，并调用其对应的方法
+通过GlideBuilder构建Glide：
+1.新建线程池
+2.新建图片缓存池和缓存池
+3.新建内存缓存管理器
+4.新建默认本地缓存管理器
+5.新建请求引擎Engine
+6.新建RequestManger检索器
+7.新建Glide
+Glide构造方法中，新建模型转换器，解码器，转码器，编码器，以及生成Glide上下文GlideContext
+通过RequestManager检索器，建立生命周期监听，并建立一个RequestManager
+完成！
+</code></pre></li>
+<li><p>into的逻辑，包含了网络请求，调用比较巧妙，使用了桥接模式</p>
+</li>
+<li>大量使用了注解，@NonNull，这个就又可以细讲了，大多数编译注解，作为编译期的辅助工具。这些注解自己项目也可以用起来，这样能避免一些空指针。</li>
+<li>module的注入</li>
+</ol>
+
       
     </div>
 
@@ -383,8 +434,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2017/02/28/java深入学习/LinkedList解析/" rel="next" title="LinkedList解析">
-                <i class="fa fa-chevron-left"></i> LinkedList解析
+              <a href="/2017/05/11/模块化浅析/" rel="next" title="模块化浅析">
+                <i class="fa fa-chevron-left"></i> 模块化浅析
               </a>
             
           </div>
@@ -392,10 +443,6 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2017/02/28/java深入学习/java线程池/" rel="prev" title="java线程池">
-                java线程池 <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -464,7 +511,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">54</span>
+                    <span class="site-state-item-count">39</span>
                     <span class="site-state-item-name">posts</span>
                   </a>
                 </div>

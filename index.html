@@ -288,7 +288,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://clunyes.github.io/2018/03/15/canvas详解/">
+    <link itemprop="mainEntityOfPage" href="http://clunyes.github.io/2018/06/08/源码阅读/glide源码学习记录/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="clunyes">
@@ -307,7 +307,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2018/03/15/canvas详解/" itemprop="url">canvas详解</a></h1>
+                <a class="post-title-link" href="/2018/06/08/源码阅读/glide源码学习记录/" itemprop="url">glide源码学习记录</a></h1>
         
 
         <div class="post-meta">
@@ -319,7 +319,7 @@
               
                 <span class="post-meta-item-text">Posted on</span>
               
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-03-15T13:36:28+08:00">2018-03-15</time>
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-06-08T09:04:12+08:00">2018-06-08</time>
             
 
             
@@ -358,149 +358,59 @@
       
         
           
-            
-          
-        
-      
-    </div>
-
-    
-
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://clunyes.github.io/2017/05/26/网易云信对接/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="clunyes">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.png">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="clunyes_blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/05/26/网易云信对接/" itemprop="url">'网易云信对接'</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-05-26T20:33:49+08:00">2017-05-26</time>
-            
-
-            
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>聊天怎么登陆</p>
-<p>打开聊天窗口<br>NimUIKit<br>/**</p>
-<pre><code> * 打开一个聊天窗口，开始聊天
- *
- * @param context       上下文
- * @param id            聊天对象ID（用户帐号account或者群组ID）
- * @param sessionType   会话类型
- * @param customization 定制化信息。针对不同的聊天对象，可提供不同的定制化。
- * @param anchor        跳转到指定消息的位置，不需要跳转填null
- */
-public static void startChatting(Context context, String id, SessionTypeEnum sessionType, SessionCustomization
-        customization, IMMessage anchor) {
-    if (sessionType == SessionTypeEnum.P2P) {
-        P2PMessageActivity.start(context, id, customization, anchor);
-    } else if (sessionType == SessionTypeEnum.Team) {
-        TeamMessageActivity.start(context, id, customization, null, anchor);
-    }
-}
-</code></pre><p>聊天界面基类<br>MessageFragment</p>
-<p>nim_message_activity_bottom_layout.xml 聊天界面的底部</p>
+            <ol>
+<li>preconditions: 优雅的参数检测，以后项目可以用</li>
+<li><p>单例</p>
+<pre><code>public static Glide get(@NonNull Context context) {
+     if (glide == null) {
+       synchronized (Glide.class) {
+         if (glide == null) {
+           checkAndInitializeGlide(context);
+         }
+       }
+     }
+    return glide;
+  }
+</code></pre></li>
+<li><p>泛型使用<br>源码中大量使用了泛型，以及泛型方法，泛型接口，泛型类</p>
+<p>  E - Element (在集合中使用，因为集合中存放的是元素)</p>
+<p>  T - Type（Java 类）， S、U、V  - 2nd、3rd、4th types</p>
+<p>  K - Key（键）</p>
+<p>  V - Value（值）</p>
+<p>  N - Number（数值类型）</p>
+<p> ？ -  通配符</p>
+</li>
+<li><p>分包</p>
+<pre><code>glide的包分为
+load：加载和解码
+manager：生命周期控制
+module
+provider
+request：加载图片的请求
+signature：
+util
+以及默认包
+</code></pre><p>分包比较简练，对外提供简单的接口，比较好懂。内部代码严谨，比较规范。</p>
+</li>
+<li><p>glide的初始化比较简单：</p>
+<pre><code>通过AndroidManifest和@GlideModule注解获取用户自定义配置GlideModule，并调用其对应的方法
+通过GlideBuilder构建Glide：
+1.新建线程池
+2.新建图片缓存池和缓存池
+3.新建内存缓存管理器
+4.新建默认本地缓存管理器
+5.新建请求引擎Engine
+6.新建RequestManger检索器
+7.新建Glide
+Glide构造方法中，新建模型转换器，解码器，转码器，编码器，以及生成Glide上下文GlideContext
+通过RequestManager检索器，建立生命周期监听，并建立一个RequestManager
+完成！
+</code></pre></li>
+<li><p>into的逻辑，包含了网络请求，调用比较巧妙，使用了桥接模式</p>
+</li>
+<li>大量使用了注解，@NonNull，这个就又可以细讲了，大多数编译注解，作为编译期的辅助工具。这些注解自己项目也可以用起来，这样能避免一些空指针。</li>
+<li>module的注入</li>
+</ol>
 
           
         
@@ -678,807 +588,6 @@ public static void startChatting(Context context, String id, SessionTypeEnum ses
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://clunyes.github.io/2017/05/04/android多渠道打包/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="clunyes">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.png">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="clunyes_blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/05/04/android多渠道打包/" itemprop="url">'android多渠道打包'</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-05-04T11:11:58+08:00">2017-05-04</time>
-            
-
-            
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>来到新公司，做业务赶项目，所以没来写博客了。</p>
-<p>新的公司：我的感觉非常不错，团队氛围，责任心，实事求是。唯一的bug就是加班太狠。自己在这个团队中希望发挥更大的作用。</p>
-<p>一直想看下怎么做多渠道打包，昨晚终于静下来去看了，美团的多渠道打包，完美解决了我的问题。</p>
-<p><a href="https://github.com/GavinCT/AndroidMultiChannelBuildTool" target="_blank" rel="noopener">https://github.com/GavinCT/AndroidMultiChannelBuildTool</a> 秒打包。</p>
-<p>手动写入读取渠道名，比如友盟</p>
-<pre><code>MobclickAgent.UMAnalyticsConfig config = new MobclickAgent.UMAnalyticsConfig(this, AppConstant.UMENG_APP_KEY, ChannelUtil.getChannel(this, AppConstant.DEFAULT_CHANNEL));
-</code></pre><p>可以读取出渠道名的，已经满足了我的需求。<br>技术是不停步的，随着7.0的推出，新的签名方式已经出现了，解决方案<a href="http://tech.meituan.com/android-apk-v2-signature-scheme.html" target="_blank" rel="noopener">http://tech.meituan.com/android-apk-v2-signature-scheme.html</a></p>
-<p>不过这个我没看，感觉还用不上。</p>
-
-          
-        
-      
-    </div>
-
-    
-
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://clunyes.github.io/2017/04/10/android widget/ConstraintLayout/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="clunyes">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.png">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="clunyes_blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/04/10/android widget/ConstraintLayout/" itemprop="url">ConstraintLayout</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-04-10T11:04:53+08:00">2017-04-10</time>
-            
-
-            
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            
-          
-        
-      
-    </div>
-
-    
-
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://clunyes.github.io/2017/04/10/android widget/flexbox-layout/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="clunyes">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.png">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="clunyes_blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/04/10/android widget/flexbox-layout/" itemprop="url">flexbox-layout</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-04-10T10:50:30+08:00">2017-04-10</time>
-            
-
-            
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            
-          
-        
-      
-    </div>
-
-    
-
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://clunyes.github.io/2017/03/13/项目总结/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="clunyes">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.png">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="clunyes_blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/03/13/项目总结/" itemprop="url">项目总结</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-03-13T09:22:58+08:00">2017-03-13</time>
-            
-
-            
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>摩课2.0</p>
-<ol>
-<li>软件架构采用mvp设计模式。用p把m和v完全隔离，利于以后模块化维护。</li>
-<li>遵循开闭原则，接口隔离原则：</li>
-</ol>
-<p>使用接口定义基本ui流程：（activity（initToolbar）,fragment（onResumeActive，onPauseActive）,dialog基于自己的特性，再进行继承扩展）<br>initVariable initView initListener initAdapter bindInitData</p>
-<ol>
-<li>采用了面向切面编程的思想<br>BaseActivity       统一初始化context resource，在onResume onPause中加入umeng的数据采集的基础逻辑。<br>统一编写Activity进出动画。加入fragment，替换fragment，fragment栈维护。<br>类似的BaseFragment</li>
-</ol>
-<p>BaseRequest     加入通用参数，加入日志打印。</p>
-<ol>
-<li><p>配置参数的处理，SharePreference。app相关的配置统一管理，用户相关的配置统一管理。</p>
-</li>
-<li><p>根据使用情况，把常量做分类<br>Intent bundle 统一Intentkeys。<br>业务相关统一BusinessKeys。<br>其余常量分为ConstantsKeys。<br>命名规范，Intent_key_描述。</p>
-</li>
-</ol>
-<p>这样得框架优点就是，代码流程规范，正常逻辑开发方便，一定程度避免了个人风格的编码方式。<br>缺点就是目前我们的presenter不够灵活，在业务发生变化的时候，接口不纯粹，不单一。</p>
-<p>解决办法就是，根据业务来，抽象部分的presenter出来，作为业务的基础presenter。</p>
-
-          
-        
-      
-    </div>
-
-    
-
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://clunyes.github.io/2017/03/09/马斯洛5大需求/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="clunyes">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.png">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="clunyes_blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/03/09/马斯洛5大需求/" itemprop="url">马斯洛5大需求</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-03-09T16:58:19+08:00">2017-03-09</time>
-            
-
-            
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p><img src="/2017/03/09/马斯洛5大需求/../../../../images/masro.jpg" alt=""></p>
-<p>五层需求是层层递进的。</p>
-<p>底层需求被满足后，人们就会继续追求上层的需求。</p>
-
-          
-        
-      
-    </div>
-
-    
-
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://clunyes.github.io/2017/03/09/图片压缩/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="clunyes">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.png">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="clunyes_blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/03/09/图片压缩/" itemprop="url">图片压缩</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-03-09T14:38:39+08:00">2017-03-09</time>
-            
-
-            
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>目前做App开发总绕不开图片这个元素。但是随着手机拍照分辨率的提升，图片的压缩成为一个很重要的问题。<br>单纯对图片进行裁切，压缩已经有很多文章介绍。但是裁切成多少，压缩成多少却很难控制好，裁切过头图片太小，<br>质量压缩过头则显示效果太差。</p>
-<p>推荐鲁班 <a href="https://github.com/Curzibn/Luban" target="_blank" rel="noopener">https://github.com/Curzibn/Luban</a></p>
-<ol>
-<li>判断图片比例值，是否处于以下区间内；</li>
-</ol>
-<pre><code>[1, 0.5625) 即图片处于 [1:1 ~ 9:16) 比例范围内
-[0.5625, 0.5) 即图片处于 [9:16 ~ 1:2) 比例范围内
-[0.5, 0) 即图片处于 [1:2 ~ 1:∞) 比例范围内
-</code></pre><ol>
-<li>判断图片最长边是否过边界值；</li>
-</ol>
-<pre><code>[1, 0.5625) 边界值为：1664 * n（n=1）, 4990 * n（n=2）, 1280 * pow(2, n-1)（n≥3）
-[0.5625, 0.5) 边界值为：1280 * pow(2, n-1)（n≥1）
-[0.5, 0) 边界值为：1280 * pow(2, n-1)（n≥1）
-</code></pre><ol>
-<li>计算压缩图片实际边长值，以第2步计算结果为准，超过某个边界值则：</li>
-</ol>
-<pre><code>width / pow(2, n-1)，height/pow(2, n-1)
-</code></pre><ol>
-<li>计算压缩图片的实际文件大小，以第2、3步结果为准，图片比例越大则文件越大。</li>
-</ol>
-<pre><code>size = (newW * newH) / (width * height) * m；
-[1, 0.5625) 则 width &amp; height 对应 1664，4990，1280 * n（n≥3），m 对应 150，300，300；
-[0.5625, 0.5) 则 width = 1440，height = 2560, m = 200；
-[0.5, 0) 则 width = 1280，height = 1280 / scale，m = 500；注：scale为比例值
-</code></pre><ol>
-<li>判断第4步的size是否过小</li>
-</ol>
-<pre><code>[1, 0.5625) 则最小 size 对应 60，60，100
-[0.5625, 0.5) 则最小 size 都为 100
-[0.5, 0) 则最小 size 都为 100
-</code></pre><ol>
-<li>将前面求到的值压缩图片 width, height, size 传入压缩流程，压缩图片直到满足以上数值</li>
-</ol>
-
-          
-        
-      
-    </div>
-
-    
-
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://clunyes.github.io/2017/03/09/viewStub/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1549,7 +658,8 @@ public static void startChatting(Context context, String id, SessionTypeEnum ses
       
         
           
-            
+            <p>动态展示ui的一种方案，节省内存，加快运行速度</p>
+
           
         
       
@@ -1737,131 +847,6 @@ dependencies {
     testCompile &apos;junit:junit:4.12&apos;
 }
 </code></pre><p>这样下来jni项目就搭建好了。</p>
-
-          
-        
-      
-    </div>
-
-    
-
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://clunyes.github.io/2017/03/08/设计模式/创建型/原型模式/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="clunyes">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.png">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="clunyes_blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/03/08/设计模式/创建型/原型模式/" itemprop="url">原型模式</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-03-08T17:32:42+08:00">2017-03-08</time>
-            
-
-            
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>使用场景</p>
-<p>已存在的类和当前需求的类比较类似，需求又比较多变时，<br>克隆一个类出来再做修改，比创建这么一个类，更加简单快捷轻量。</p>
 
           
         
@@ -3081,11 +2066,1201 @@ synchronized会自动释放锁，而Lock一定要求程序员手工释放，并�
 
 
     
+      
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://clunyes.github.io/2017/02/28/java深入学习/java线程池/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="clunyes">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="clunyes_blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/02/28/java深入学习/java线程池/" itemprop="url">java线程池</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-02-28T17:27:56+08:00">2017-02-28</time>
+            
+
+            
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>首先要理清几个类</p>
+<pre><code>Executor 接口，只有一个抽象方法，执行runnable任务。
+
+ExecutorService 接口，继承自Executor，添加了一些生命周期管理的方法。
+Executor的生命周期有三种状态，运行 ，关闭 ，终止。Executor创建时处于运行状态。
+当调用ExecutorService.shutdown()后，处于关闭状态，isShutdown()方法返回true。
+这时，不应该再想Executor中添加任务，所有已添加的任务执行完毕后，Executor处于终止状态，isTerminated()返回true。
+如果Executor处于关闭状态，往Executor提交任务会抛出unchecked exception RejectedExecutionException。
+
+AbstractExecutorService 抽象类，实现了ExecutorService
+
+ThreadPoolExecutor 实现类，继承自AbstractExecutorService
+</code></pre><p>可返回值的任务必须实现Callable接口，类似的，无返回值的任务必须Runnable接口。    </p>
+
+          
+        
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://clunyes.github.io/2017/02/28/java深入学习/LinkedList解析/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="clunyes">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="clunyes_blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/02/28/java深入学习/LinkedList解析/" itemprop="url">LinkedList解析</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-02-28T14:52:48+08:00">2017-02-28</time>
+            
+
+            
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>LinkedList与ArrayList一样实现List接口，只是ArrayList是List接口的大小可变数组的实现，<br>LinkedList是List接口链表的实现。基于链表实现的方式使得LinkedList在插入和删除时更优于ArrayList，<br>而随机访问则比ArrayList逊色些。</p>
+<p><img src="/2017/02/28/java深入学习/LinkedList解析/../../../../images/linkedlist/singleLink.jpg" alt=""></p>
+<p><img src="/2017/02/28/java深入学习/LinkedList解析/../../../../images/linkedlist/singleLoopLink.jpg" alt=""></p>
+<p><img src="/2017/02/28/java深入学习/LinkedList解析/../../../../images/linkedlist/doubleLink.jpg" alt=""></p>
+<p><img src="/2017/02/28/java深入学习/LinkedList解析/../../../../images/linkedlist/doubleLoopLink.jpg" alt=""></p>
+<p>LinkedList 是一个双向循环链表</p>
+
+          
+        
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://clunyes.github.io/2017/02/28/java深入学习/ArrayList解析/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="clunyes">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="clunyes_blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/02/28/java深入学习/ArrayList解析/" itemprop="url">ArrayList解析</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-02-28T14:13:40+08:00">2017-02-28</time>
+            
+
+            
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>ArrayList 是一个数组队列，相当于动态数组。</p>
+<p>难点</p>
+<p><img src="/2017/02/28/java深入学习/ArrayList解析/../../../../images/listadd.jpg" alt=""></p>
+<p><img src="/2017/02/28/java深入学习/ArrayList解析/../../../../images/listinsert.jpg" alt=""></p>
+<p>总结<br>ArrayList和LinkedList的区别</p>
+<pre><code>ArrayList是实现了基于动态数组的数据结构，LinkedList基于链表的数据结构。
+对于随机访问get和set，ArrayList觉得优于LinkedList，因为LinkedList要移动指针。
+对于新增和删除操作add和remove，LinkedList比较占优势，因为ArrayList要移动数据。
+</code></pre><p>ArrayList和Vector的区别</p>
+<pre><code>Vector和ArrayList几乎是完全相同的,唯一的区别在于Vector是同步类(synchronized)，属于强同步类。因此开销就比ArrayList要大，访问要慢。正常情况下,大多数的Java程序员使用ArrayList而不是Vector,因为同步完全可以由程序员自己来控制。
+Vector每次扩容请求其大小的2倍空间，而ArrayList是1.5倍。
+Vector还有一个子类Stack.
+</code></pre>
+          
+        
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://clunyes.github.io/2017/02/28/java深入学习/java集合理解/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="clunyes">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="clunyes_blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/02/28/java深入学习/java集合理解/" itemprop="url">java集合理解</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-02-28T11:13:26+08:00">2017-02-28</time>
+            
+
+            
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>近来面试，屡屡被数据结构算法所虐。</p>
+<p>所以最近在恶补这方面的知识，想想以前在学校还是too young too simple，要是有老师傅带带我该多好。<br>老师我错了，我真的好想再打Dota，哦不，再学数据结构算法。</p>
+<p>Java集合是java提供的工具包，包含了常用的数据结构：集合、链表、队列、栈、数组、映射等。</p>
+<p>接下来梳理一下</p>
+<pre><code>最主要的接口Collection接口，map接口
+
+Collection接口
+
+    是List、Set和Queue接口的父接口
+    定义了可用于操作List、Set和Queue的方法-增删改查
+
+List接口
+
+    List是元素有序并且可以重复的集合，被称为序列
+    List可以精确的控制每个元素的插入位置，或删除某个位置元素
+    List接口的常用子类：
+    ArrayList 
+    LinkedList 
+    Vector
+    Stack
+
+Set接口
+
+    Set接口中不能加入重复元素，无序
+    Set接口常用子类：
+    散列存放：HashSet
+    有序存放：TreeSet
+
+Map和HashMap
+
+Map接口
+
+    Map提供了一种映射关系，其中的元素是以键值对（key-value）的形式存储的，能够实现根据key快速查找value
+    Map中的键值对以Entry类型的对象实例形式存在
+    键（key值）不可重复，value值可以
+    每个建最多只能映射到一个值
+    Map接口提供了分别返回key值集合、value值集合以及Entry（键值对）集合的方法
+    Map支持泛型，形式如：Map&lt;K,V&gt;
+
+HashMap类
+
+    HashMap是Map的一个重要实现类，也是最常用，基于哈希表实现
+    HashMap中的Entry对象是无序排列的
+    Key值和Value值都可以为null,但是一个HashMap只能有一个key值为null的映射（key值不可重复）
+
+Comparable和Comparator
+
+Comparable接口——可比较的
+
+    实现该接口表示：这个类的实例可以比较大小，可以进行自然排序
+    定义了默认的比较规则
+    其实现类需要实现compareTo()方法
+    compareTo()方法返回正数表示大，负数表示小0表示相等
+
+Comparator接口——比较工具接口
+
+    用于定义临时比较规则，而不是默认比较规则
+    其实现类需要实现compare()方法
+    Comparable和Comparator都是Java集合框架的成员
+
+Iterator接口
+
+    集合输出的标准操作
+    标准做法，使用Iterator接口
+    操作原理：
+    Iterator是专门的迭代输出接口，迭代输出就是将元素一个个进行判断，判断其是否有内容，如果有内容则把内容取出。
+</code></pre><p><img src="/2017/02/28/java深入学习/java集合理解/../../../../../images/collections.png" alt="">.</p>
+
+          
+        
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://clunyes.github.io/2017/02/28/android中的各种位置/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="clunyes">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="clunyes_blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/02/28/android中的各种位置/" itemprop="url">android中的各种位置</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-02-28T10:57:42+08:00">2017-02-28</time>
+            
+
+            
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p><img src="/2017/02/28/android中的各种位置/../../../images/androidPosition.png" alt="">.</p>
+<pre><code>View提供的获取坐标方法
+　　getTop()：获取到的是View自身的顶边到其父布局顶边的距离。
+　　getLeft()：获取到的是View自身的左边到其父布局左边的距离。
+　　getRight()：获取到的是View自身的右边到其父布局左边的距离。
+　　getBottom()：获取到的是View自身的底边到其父布局顶边的距离。
+</code></pre><hr>
+<pre><code>MotionEvent提供的方法
+　　getX()：获取点击事件距离控件左边的距离，即视图坐标。
+　　getY()：获取点击事件距离控件顶边的距离，即视图坐标。
+　　getRawX()：获取点击事件距离整个屏幕左边的距离，即绝对坐标。
+　　getRawY()：获取点击事件距离整个屏幕顶边的距离，即绝对坐标。
+　　相信通过上图，读者们应该对MotionEvent和Android坐标系有了一个比较清楚的认识。 
+</code></pre>
+          
+        
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://clunyes.github.io/2017/02/27/java深入学习/javaThread状态/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="clunyes">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="clunyes_blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/02/27/java深入学习/javaThread状态/" itemprop="url">javaThread状态</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-02-27T10:51:02+08:00">2017-02-27</time>
+            
+
+            
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>首先一个小问题：线程实现可以是thread和runnable，本身两者并没有优劣，但是一个是继承一个是接口，如果你要继承其他类，还是用runnable。</p>
+<p>run和start的区别，start方法开启了新线程，run方法没有，start方法不阻塞主线程。</p>
+<p>以下是thread的两张状态图，有助于理解线程的生命周期（哪个顺眼你看哪个）。</p>
+<p><img src="/2017/02/27/java深入学习/javaThread状态/../../../../images/threadStatus.jpg" alt=""></p>
+<p><img src="/2017/02/27/java深入学习/javaThread状态/../../../../images/threadProcess.jpg" alt=""></p>
+<p>两个图有个冲突，即join方法，待验证。</p>
+<ol>
+<li><p>程序通过Thread t = new Thread()，调用t.start()启动一个线程，使该线程进入可运行(Runnable)的状态。</p>
+</li>
+<li><p>由JVM的决定去调度(Scheduler) 在可运行状态（Runnable）下的线程,使该线程处于运行 (Running) 状态,<br>由于JVM的调度会出现不可控性，即不是优先级高的先被调用，可能先调用，也可能后调用的的情况。运行状态(Running)下，<br>调用礼让yield()方法，可以使线程回到可运行状态(Runnable)下，再次JVM的调度（并不依赖优先级）。</p>
+</li>
+<li><p>线程在Running的过程中可能会遇到阻塞(Blocked)情况</p>
+</li>
+</ol>
+<p>①．调用join()和sleep()方法，sleep()时间结束或被打断，join()中断,IO完成都会回到Runnable状态，等待JVM的调度。</p>
+<p>②．调用wait()，使该线程处于等待池(wait blocked pool),直到notify()/notifyAll()，线程被唤醒被放到锁池(lock blocked pool )<br>，释放同步锁使线程回到可运行状态（Runnable）</p>
+<p>③．对Running状态的线程加同步锁(Synchronized)使其进入(lock blocked pool ),同步锁被释放进入可运行状态(Runnable)。</p>
+<ol>
+<li>线程run()运行结束或异常退出，线程到达死亡状态(Dead)</li>
+</ol>
+<p>sleep和wait的区别有：</p>
+<pre><code>sleep是Thread类的方法,wait是Object类中定义的方法.
+
+Thread.sleep不会导致锁行为的改变, 如果当前线程是拥有锁的, 那么Thread.sleep不会让线程释放锁.
+
+Thread.sleep和Object.wait都会暂停当前的线程. OS会将执行时间分配给其它线程. 区别是, 调用wait后, 
+需要别的线程执行notify/notifyAll才能够重新获得CPU执行时间.
+</code></pre><p>sleep不会释放锁，yield同样不会释放锁。</p>
+<pre><code>join()方法
+
+在很多情况下，主线程创建并启动了线程，如果子线程中进行大量耗时运算，主线程往往将早于子线程结束之前结束。
+这时，如果主线程想等待子线程执行完成之后再结束，比如子线程处理一个数据，主线程要取得这个数据中的值，就要用到join()方法了。
+方法join()的作用是等待线程对象销毁。
+</code></pre><p>线程的上下文切换：</p>
+<pre><code>对于单核CPU来说（对于多核CPU，此处就理解为一个核），CPU在一个时刻只能运行一个线程，
+当在运行一个线程的过程中转去运行另外一个线程，这个叫做线程上下文切换（对于进程也是类似）。
+实际上就是 存储和恢复CPU状态的过程，它使得线程执行能够从中断点恢复执行。
+</code></pre><p>停止线程</p>
+<p>停止线程是在多线程开发时很重要的技术点，掌握此技术可以对线程的停止进行有效的处理。<br>停止一个线程可以使用Thread.stop()方法，但最好不用它。该方法是不安全的，已被弃用。<br>在Java中有以下3种方法可以终止正在运行的线程：</p>
+<pre><code>使用退出标志，使线程正常退出，也就是当run方法完成后线程终止
+
+使用stop方法强行终止线程，但是不推荐使用这个方法，因为stop和suspend及resume一样，都是作废过期的方法，使用他们可能产生不可预料的结果。
+
+使用interrupt方法中断线程，但这个不会终止一个正在运行的线程，还需要加入一个判断才可以完成线程的停止。
+</code></pre><p>暂停线程</p>
+<pre><code>interrupt()方法
+</code></pre><p>线程的优先级</p>
+<pre><code>public final static int MIN_PRIORITY = 1;
+public final static int NORM_PRIORITY = 5;
+public final static int MAX_PRIORITY = 10;
+</code></pre><p>守护线程</p>
+<pre><code>在Java线程中有两种线程，一种是User Thread（用户线程），另一种是Daemon Thread(守护线程)。
+
+Daemon的作用是为其他线程的运行提供服务，比如说GC线程。
+其实User Thread线程和Daemon Thread守护线程本质上来说去没啥区别的，唯一的区别之处就在虚拟机的离开：
+如果User Thread全部撤离，那么Daemon Thread也就没啥线程好服务的了，所以虚拟机也就退出了。
+</code></pre>
+          
+        
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://clunyes.github.io/2017/02/24/android系统分析/activity启动和service启动/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="clunyes">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="clunyes_blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/02/24/android系统分析/activity启动和service启动/" itemprop="url">activity启动和service启动</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-02-24T13:49:03+08:00">2017-02-24</time>
+            
+
+            
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>对于android最重要的两个核心组件activity service研究也是比较多的</p>
+<p>浅显的问题1： startService和bindService有什么区别：</p>
+<pre><code>startService()方式启动，Service是通过接受Intent并且会经历onCreate()和onStartCommand()。当用户在发出意图使之销毁时会经历onDestroy()。
+而bindService()方式启动，与Activity绑定的时候，会经历onCreate()和onBind()，而当Activity被销毁的时候，Service会先调用onUnbind()然后是onDestroy()。
+
+使用startService()方法启用服务，调用者与服务之间没有关连，即使调用者退出了，服务仍然运行。
+使用bindService()方法启用服务，调用者与服务绑定在了一起，调用者一旦退出，服务也就终止。
+</code></pre><p>深入的问题1:<br>Binder优势：<br>Android需要建立一套新的IPC机制来满足系统对通信方式，传输性能和安全性的要求，这就是Binder。<br><a href="http://blog.csdn.net/universus/article/details/6211589" target="_blank" rel="noopener">http://blog.csdn.net/universus/article/details/6211589</a> 这篇文章可以反复阅读。</p>
+<pre><code>Binder通信的四个角色：
+
+    Client进程：使用服务的进程。
+    Server进程：提供服务的进程。
+    ServiceManager进程：ServiceManager的作用是将字符形式的Binder名字转化成Client中对该Binder的引用，使得Client能够通过Binder名字获得对Server中Binder实体的引用。
+    Binder驱动：驱动负责进程之间Binder通信的建立，Binder在进程之间的传递，Binder引用计数管理，数据包在进程之间的传递和交互等一系列底层支持。
+</code></pre><p>那么他们的启动流程到底是怎么样的？</p>
+<p>看到一篇非常好的文章<br>activity启动流程文章： <a href="http://www.jianshu.com/p/e0a6717bc75e" target="_blank" rel="noopener">http://www.jianshu.com/p/e0a6717bc75e</a><br>，我就不献丑了</p>
+<p>基本流程-两个ipc，应用进程和system server进程，应用进程里涉及到的线程包括ui线程和ApplicationThread</p>
+<pre><code>Activty---ActivityManagerProxy : ActvitiyManagerNative--ActivityManagerService
+
+ActivityManagerService--ApplicationThreadProxy : ApplicationThreadNative--ApplicationThread-(H handler)-ActivityThread
+</code></pre><p>service和activity流程基本差不多</p>
+<p>我这里介绍下一些关键的类</p>
+<pre><code>ActivityManagerService （很多都是简称ams，类似的重要服务还有很多PackageManagerService，WindowManagerService）
+相当于BookManagerService，是服务端。
+
+服务端提供哪些接口？IBookManager中说明提供了哪些接口。
+
+ActivityManagerNative
+怎么和服务端通信呢，要一个AIDL的接口，这个相当于IBookManager.Stub。
+
+ActivityManagerProxy
+具体方法的实现在呢，Proxy就是具体实现了
+
+Instrumentation
+工具类
+</code></pre><p><a href="http://clunyes.github.io/2017/2/20/android系统分析/AIDL的梳理.md/">具体aidl怎么实现</a>请看这里.    </p>
+<p>关于AMS，AMS并不是字面意思Activity管理服务，而是service也在其中管理。</p>
+<p>启动Activity至少需要两个前提，第一是，应用进程存在，第二AMS已经初始化完毕。</p>
+
+          
+        
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://clunyes.github.io/2017/02/23/android tip/gradle参数说明/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="clunyes">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="clunyes_blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/02/23/android tip/gradle参数说明/" itemprop="url">gradle参数说明</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-02-23T18:08:49+08:00">2017-02-23</time>
+            
+
+            
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>jumboMode 不知道什么意思，和multiDex有类似的功能</p>
+
+          
+        
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
   </section>
 
   
   <nav class="pagination">
-    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="page-number" href="/page/3/">3</a><a class="extend next" rel="next" href="/page/2/"><i class="fa fa-angle-right" aria-label="Next page"></i></a>
+    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="extend next" rel="next" href="/page/2/"><i class="fa fa-angle-right" aria-label="Next page"></i></a>
   </nav>
 
 
@@ -3132,7 +3307,7 @@ synchronized会自动释放锁，而Lock一定要求程序员手工释放，并�
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">54</span>
+                    <span class="site-state-item-count">39</span>
                     <span class="site-state-item-name">posts</span>
                   </a>
                 </div>
