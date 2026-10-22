@@ -116,8 +116,24 @@ footer{
   <h2>项目</h2>
   <div class="grid">
 
+    <div class="card" id="tracedock">
+      <h3>TraceDock · AI 自动日志排查工具 <span class="badge">在测 · AI Agent</span></h3>
+      <p>
+        把「连手机、翻几万行 logcat、手工配对请求与响应」这套 Android 排查流程整个自动化：选应用与设备、说一句问题
+        （或给一张参考图），点开始后由 AI 自己操作手机找到目标页面、触发请求、采集日志，最后产出能对回原始日志 id 的结论，
+        并可导出证据 ZIP。核心目标是「无感」——不让使用者先理解日志格式和采集参数。
+      </p>
+      <p>
+        自研锚点机制解决大日志量下的证据丢失：按已验证端点直取命中日志并提升优先级，使其在 400 条预算裁剪中不被淘汰；
+        动作只允许白名单内的 8 种，每次执行前强制新鲜观察，支付/删除等危险操作由本地执行器拦截，凭据一次性注入且不进模型上下文。
+        真机验收覆盖 3 万余条日志的完整登录链路，源码联合分析产出 5 条可逐行核对的代码引用。
+      </p>
+      <div class="meta">Python 3.11 · FastAPI · SQLite WAL · React 19 · TypeScript · Vite · ADB · 视觉模型 · 565 后端 / 162 前端用例</div>
+      <div class="meta"><a href="https://clunyes.github.io/2026/10/22/ai-logtracing/">项目复盘：让 AI 自己点手机抓日志 →</a></div>
+    </div>
+
     <div class="card" id="odm-pack">
-      <h3>ODM Pack · ODM 打包 Web 平台 <span class="badge">最新 · AI 协作</span></h3>
+      <h3>ODM Pack · ODM 打包 Web 平台 <span class="badge">AI 协作</span></h3>
       <p>
         把原来靠人记的一串手工步骤——改配置、选分支、跑预检、触发 Jenkins、回写台账——收进一条四步向导。
         选完客户与交付版本，平台按「发布线匹配」推导配置仓、主工程、配网、packscript 四条分支，兼容多套历史命名；
