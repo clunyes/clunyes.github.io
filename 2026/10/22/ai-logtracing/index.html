@@ -1,0 +1,1011 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.0.6" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.png?v=6.0.6">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.png?v=6.0.6">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.png?v=6.0.6">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.0.6" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '',
+    scheme: 'Pisces',
+    version: '6.0.6',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  
+  <meta name="keywords" content="Hexo, NexT" />
+
+
+<meta name="description" content="做 Android 这些年，最费时间的从来不是写页面，是排查问题。 用户说「登录一直转圈」，你把手机连上电脑，adb logcat 刷屏，几万行日志滚过去；页面在哪个 Activity 不知道，用户点的是哪个按钮不知道，那个请求是第几次重试触发的也不知道。最后能定位问题的那几十行，往往夹在几千行无关日志中间。这套流程我重复了很多年，每次都在做同一件事：手工重现、手工翻日志、手工把请求和响应配对。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="TraceDock：让 AI 自己点手机抓日志，一次 Android 排查的自动化实践">
+<meta property="og:url" content="https://clunyes.github.io/2026/10/22/ai-logtracing/index.html">
+<meta property="og:site_name" content="clunyes_blog">
+<meta property="og:description" content="做 Android 这些年，最费时间的从来不是写页面，是排查问题。 用户说「登录一直转圈」，你把手机连上电脑，adb logcat 刷屏，几万行日志滚过去；页面在哪个 Activity 不知道，用户点的是哪个按钮不知道，那个请求是第几次重试触发的也不知道。最后能定位问题的那几十行，往往夹在几千行无关日志中间。这套流程我重复了很多年，每次都在做同一件事：手工重现、手工翻日志、手工把请求和响应配对。">
+<meta property="og:locale">
+<meta property="article:published_time" content="2026-10-22T02:00:00.000Z">
+<meta property="article:modified_time" content="2026-10-22T09:01:59.010Z">
+<meta property="article:author" content="clunyes">
+<meta name="twitter:card" content="summary">
+
+
+
+
+
+
+  <link rel="canonical" href="https://clunyes.github.io/2026/10/22/ai-logtracing/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>TraceDock：让 AI 自己点手机抓日志，一次 Android 排查的自动化实践 | clunyes_blog</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"> 
+
+<div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">clunyes_blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+          
+  <li class="menu-item menu-item-home">
+    <a href="/%20" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />Home</a>
+</li>
+
+      
+        
+        
+          
+  <li class="menu-item menu-item-about">
+    <a href="/about/%20" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-user"></i> <br />About</a>
+</li>
+
+      
+        
+        
+          
+  <li class="menu-item menu-item-archives">
+    <a href="/archives/%20" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />Archives</a>
+</li>
+
+      
+        
+        
+          
+  <li class="menu-item menu-item-portfolio">
+    <a href="/portfolio/%20" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-code"></i> <br />项目</a>
+</li>
+
+      
+
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+  
+
+
+
+ </div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://clunyes.github.io/2026/10/22/ai-logtracing/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="clunyes">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="clunyes_blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">TraceDock：让 AI 自己点手机抓日志，一次 Android 排查的自动化实践</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2026-10-22T10:00:00+08:00">2026-10-22</time>
+            
+
+            
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>做 Android 这些年，最费时间的从来不是写页面，是排查问题。</p>
+<p>用户说「登录一直转圈」，你把手机连上电脑，<code>adb logcat</code> 刷屏，几万行日志滚过去；页面在哪个 Activity 不知道，用户点的是哪个按钮不知道，那个请求是第几次重试触发的也不知道。最后能定位问题的那几十行，往往夹在几千行无关日志中间。这套流程我重复了很多年，每次都在做同一件事：手工重现、手工翻日志、手工把请求和响应配对。</p>
+<p>TraceDock 就是为这件事做的。它是我在组内 Q4 主推的一个本地工具，现在的状态是<strong>开发完成、正在测试验收、准备 11 月推给组内同事用</strong>。</p>
+<p>一句话说清楚它干什么：</p>
+<blockquote>
+<p>选好应用与设备，描述一句问题，或者干脆给一张「要操作的页面」的参考图，点开始。剩下的它自己来 —— 自己操作手机找到目标页面、触发请求、把日志收上来，最后给你一份能对回原始日志 id 的排查结论。</p>
+</blockquote>
+<p>开始之后不用碰手机，可以继续干别的活。这不是演示视频里的效果，下面会给出真机跑出来的完整数据。</p>
+<span id="more"></span>
+
+<h2 id="一、它到底解决谁的什么问题"><a href="#一、它到底解决谁的什么问题" class="headerlink" title="一、它到底解决谁的什么问题"></a>一、它到底解决谁的什么问题</h2><p>先把背景说清楚，不然容易看成一个「AI 玩具」。</p>
+<p>我们组做的是 Android App，日常排查集中在两类：</p>
+<ul>
+<li><strong>崩溃 &#x2F; ANR</strong>：堆栈能拿到，但要还原「崩溃前用户干了什么」很痛苦</li>
+<li><strong>接口问题</strong>：请求发了没回、回了但字段不对、登录态掉了、签名校验失败</li>
+</ul>
+<p>这两类问题的共同点是：<strong>现象在界面上，证据在日志里，而中间那段链路只能靠人手工补</strong>。尤其接口问题，一次页面跳转会打出十几条请求，你得自己判断哪条是目标、它的响应体在哪、中间有没有重试。</p>
+<p>所以这个项目的目标不是「让模型看日志说话」，而是把整条链路自动化：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">找页面 → 触发请求 → 采日志 → 筛出相关的那几百条 → 结合源码判断 → 给出可回查的结论</span><br></pre></td></tr></table></figure>
+
+<p>验收标准我也定得很朴素，写在交接文档里：<strong>判断标准是「同事能不能自己用起来」</strong>。</p>
+<p>这条标准直接推导出一条设计原则，我叫它「无感」：用户只做三件事 —— 选应用与设备、说一句问题（或者给张参考图）、点开始。任何要求用户先理解日志格式、采集参数、点击路线的环节，<strong>都按缺陷处理</strong>，不是「文档里写一下就行」。</p>
+<p>另一条是「有据」：结论必须能对回真实日志 id。没有证据就老老实实写缺口，不许用「可能」「应该」糊过去。</p>
+<h2 id="二、整体链路长什么样"><a href="#二、整体链路长什么样" class="headerlink" title="二、整体链路长什么样"></a>二、整体链路长什么样</h2><p>项目是本地跑的，服务默认只监听 <code>127.0.0.1:8766</code>，不对外。这个选择是刻意的：它要操作手机、要读源码、要把日志发给你配的模型，这些都不该离开本机。</p>
+<p>完整链路是这样：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">蒲公英选包 / 本地 APK</span><br><span class="line">   → APK 注册与缓存（SHA256 去重、3 GiB 上限、7 天过期、单包 768 MiB）</span><br><span class="line">   → 显式确认设备与安装版本</span><br><span class="line">   → CaptureManager（ADB logcat）</span><br><span class="line">   → LogParser（按 UID/PID 归属到应用）+ ReplayGuard</span><br><span class="line">   → Store（SQLite WAL + 每会话一份 raw.log）</span><br><span class="line">   → WebSocket 推到日志二级页</span><br><span class="line">   → modules.prescreen 预筛（锚点直取 + 全量扫描）</span><br><span class="line">   → GeneralSelector / RequestContextBuilder（400 条预算）</span><br><span class="line">   → investigation / case_analysis 统一诊断</span><br><span class="line">   → 可选：固定原生源码快照 → 有界检索 → 脱敏片段 → 证据校验</span><br><span class="line">   → 首页当前判断 / 二级结论 / 原始证据 / 导出 ZIP</span><br></pre></td></tr></table></figure>
+
+<p>前段是「把日志收干净」，中段是「从几万条里挑出该看的那几百条」，后段是「让模型在这几百条上做判断，并且必须给出引用」。</p>
+<p>中间那条预筛链路是整个项目的技术核心，第五节细讲。</p>
+<h2 id="三、技术栈：克制到什么程度"><a href="#三、技术栈：克制到什么程度" class="headerlink" title="三、技术栈：克制到什么程度"></a>三、技术栈：克制到什么程度</h2><p>先把实证摆出来，避免空谈。</p>
+<p>后端 <code>pyproject.toml</code> 里运行时依赖只有 5 个：</p>
+<figure class="highlight toml"><table><tr><td class="code"><pre><span class="line"><span class="attr">dependencies</span> = [</span><br><span class="line">  <span class="string">&quot;fastapi&gt;=0.115,&lt;1&quot;</span>,</span><br><span class="line">  <span class="string">&quot;uvicorn&gt;=0.30,&lt;1&quot;</span>,</span><br><span class="line">  <span class="string">&quot;python-multipart&gt;=0.0.18,&lt;1&quot;</span>,</span><br><span class="line">  <span class="string">&quot;websockets&gt;=14,&lt;18&quot;</span>,</span><br><span class="line">  <span class="string">&quot;Pillow&gt;=10,&lt;13&quot;</span>,</span><br><span class="line">]</span><br></pre></td></tr></table></figure>
+
+<p>没有 ORM，没有任务队列，没有缓存中间件。数据库用标准库 <code>sqlite3</code>，开 WAL 模式；日志原文按会话落成 <code>raw.log</code>，库里只存索引和结构化字段。</p>
+<p>这不是「不会用」，是这个场景不需要：</p>
+<ul>
+<li>单人本地工具，没有并发压力，SQLite 完全够</li>
+<li>装一个 Redis 或 Celery，只会让同事的启动步骤变长</li>
+<li>依赖越少，出问题越好查，换台机器越好装</li>
+</ul>
+<p>前端是 React 19 + Vite 6 + TypeScript 5.7，UI 组件自己写，只有 <code>lucide-react</code> 一个图标库。测试用 vitest 3 + Testing Library，大约 40 个组件，每个组件旁边都有一份 <code>.test.tsx</code>。</p>
+<p>后端分了 29 个模块，职责切得比较细，主要几块：</p>
+<table>
+<thead>
+<tr>
+<th>模块</th>
+<th>职责</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>capture</code> &#x2F; <code>device_control</code></td>
+<td>logcat 采集、ADB 动作</td>
+</tr>
+<tr>
+<td><code>store</code></td>
+<td>SQLite 会话与日志索引</td>
+</tr>
+<tr>
+<td><code>modules.prescreen</code></td>
+<td>日志预筛（锚点 + 扫描）</td>
+</tr>
+<tr>
+<td><code>selection</code> &#x2F; <code>request_context</code></td>
+<td>400 条预算内的日志挑选与请求上下文拼装</td>
+</tr>
+<tr>
+<td><code>investigation</code> &#x2F; <code>case_analysis</code></td>
+<td>诊断主流程</td>
+</tr>
+<tr>
+<td><code>analysis</code> &#x2F; <code>live_analysis</code></td>
+<td>分析任务调度与流式输出</td>
+</tr>
+<tr>
+<td><code>autonomy</code> &#x2F; <code>autonomy_api</code></td>
+<td>自主任务：截图 → 判断 → 动作 → 复检</td>
+</tr>
+<tr>
+<td><code>vision</code></td>
+<td>视觉模型调用</td>
+</tr>
+<tr>
+<td><code>source*</code></td>
+<td>源码快照、有界检索、片段脱敏与证据校验</td>
+</tr>
+<tr>
+<td><code>llm</code></td>
+<td>OpenAI 兼容模型客户端</td>
+</tr>
+<tr>
+<td><code>apk_cache</code> &#x2F; <code>pgyer</code></td>
+<td>蒲公英选包、APK 缓存</td>
+</tr>
+</tbody></table>
+<p>当前的测试状态：</p>
+<table>
+<thead>
+<tr>
+<th>项</th>
+<th>结果</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>后端 pytest</td>
+<td><strong>565 passed &#x2F; 2 skipped</strong></td>
+</tr>
+<tr>
+<td>前端 vitest</td>
+<td><strong>162 passed</strong></td>
+</tr>
+<tr>
+<td>前端类型检查</td>
+<td><code>tsc --noEmit</code> 通过</td>
+</tr>
+<tr>
+<td>前端生产构建</td>
+<td><code>tsc -b &amp;&amp; vite build</code> 通过</td>
+</tr>
+</tbody></table>
+<p>写测试这件事，在这个项目里不是为了覆盖率好看。因为核心链路是「模型输出 → 本地校验 → 执行动作」，任何一个环节放宽校验都会变成一个线上事故，所以每条约束都配了用例。</p>
+<h2 id="四、最难的不是调模型，是把边界画死"><a href="#四、最难的不是调模型，是把边界画死" class="headerlink" title="四、最难的不是调模型，是把边界画死"></a>四、最难的不是调模型，是把边界画死</h2><p>AI 自动操作手机，听起来最玄的是「模型看得懂页面」。实际做过就知道，模型看得懂反而是最容易的部分，难的是<strong>你敢让它动手到什么程度</strong>。</p>
+<h3 id="4-1-动作白名单-新鲜观察"><a href="#4-1-动作白名单-新鲜观察" class="headerlink" title="4.1 动作白名单 + 新鲜观察"></a>4.1 动作白名单 + 新鲜观察</h3><p>模型能发出的动作只有这几个：<code>tap / swipe / back / wait / input / login / finish / blocked</code>。</p>
+<p>每个动作执行前，必须先拿到一次<strong>新鲜的</strong>页面观察（截图 + 界面结构）。如果这次观察已经过期，直接抛 <code>StaleObservationError</code>，动作不执行，重新观察。</p>
+<p>这条规则是踩坑踩出来的。测试中遇到过：模型看完截图决定输入账号，但那一步等了太久，界面已经自己跳走了，结果文字被输到了另一个页面的输入框里。现在输入动作前的观察失效被视为「可重新观察的异常」，而不是一个需要宽容的错误。</p>
+<h3 id="4-2-危险动作在本地拦，不靠模型自觉"><a href="#4-2-危险动作在本地拦，不靠模型自觉" class="headerlink" title="4.2 危险动作在本地拦，不靠模型自觉"></a>4.2 危险动作在本地拦，不靠模型自觉</h3><p>支付、下单、删除这类按钮，一律由<strong>本地执行器</strong>拦截，不依赖提示词里那句「请不要点击危险按钮」。</p>
+<p>同样，凭据只从环境变量 <code>LOGTRACING_TEST_CREDENTIALS</code> 读，<code>login</code> 动作在本机一次性注入，<strong>不进模型上下文</strong>，相关截图做遮挡。模型知道「需要登录」，但不知道该用什么账号。</p>
+<h3 id="4-3-每个动作前记游标，只认边界之后的证据"><a href="#4-3-每个动作前记游标，只认边界之后的证据" class="headerlink" title="4.3 每个动作前记游标，只认边界之后的证据"></a>4.3 每个动作前记游标，只认边界之后的证据</h3><p>这是「有据」落到代码上的方式。</p>
+<p>每个动作执行前保存一次日志游标。动作完成后，只接受<strong>这个游标之后</strong>新发起的请求与响应作为证据。这样就不会出现「上一轮页面留下的响应，被当成本轮动作的结果」这种假阳性。</p>
+<p>对应地，证据状态只有三种，不允许模糊：<code>not_observed</code> &#x2F; <code>request_observed</code> &#x2F; <code>response_observed</code>。</p>
+<h3 id="4-4-状态机和上限"><a href="#4-4-状态机和上限" class="headerlink" title="4.4 状态机和上限"></a>4.4 状态机和上限</h3><p>自主任务的状态是 <code>queued → running → blocked / completed / error / cancelled / interrupted</code>，阶段是 <code>checking / navigating / waiting / analyzing / finished</code>。</p>
+<p>三道硬上限：最多 30 步、360 秒、单次分析 120 秒。超了就停，不是无限循环。</p>
+<p><code>blocked</code> 这个状态我要求得很严：必须写清楚<strong>缺什么、谁来做、怎么继续</strong>。写不出来就不许用 <code>blocked</code> 糊过去。这条规则来自一次真实故障 —— 导航时设备操作报错，异常一路冒到兜底逻辑，任务被标成 <code>error</code>，看起来像代码 bug，实际只是需要人去点一下屏幕上的授权弹窗。现在首次拦截会写进时间线并要求改用只读动作，第二次才升级为 <code>blocked</code>。</p>
+<h2 id="五、锚点机制：一个真实性能缺陷的修复"><a href="#五、锚点机制：一个真实性能缺陷的修复" class="headerlink" title="五、锚点机制：一个真实性能缺陷的修复"></a>五、锚点机制：一个真实性能缺陷的修复</h2><p>这一节是我最想写的，因为它完整地体现了「怎么发现、怎么定位、怎么修、怎么防回归」。</p>
+<h3 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h3><p>自主任务流程是：AI 自己操作手机 → 找到目标端点 → 停采 → 把这个端点交给分析链路。</p>
+<p>分析链路的日志预算默认是 <strong>400 条</strong>。预筛阶段先按关键词扫描，扫描上限 <code>SCAN_CAP = 20000</code>。</p>
+<p>真机上跑出来的会话是 <strong>3 万多条日志</strong>。目标请求确实抓到了，日志 id 很靠后，但它在 2 万条扫描窗口之外 —— 于是被直接漏掉。模型拿到 400 条日志，里面没有目标请求，结论自然是错的。</p>
+<p>这个 bug 最阴的地方是：它不报错。任务显示成功，分析显示完成，只是结论不对。如果没有真机验收，纯靠单元测试根本发现不了。</p>
+<h3 id="修法"><a href="#修法" class="headerlink" title="修法"></a>修法</h3><p>自主任务结束时，把已经确认的 <code>_target_endpoint</code> 传给 <code>analysis.start(..., anchors=[...])</code>。</p>
+<p>预筛阶段先用 <code>search LIKE %anchor%</code> 从全库<strong>直取</strong>命中日志（<code>ANCHOR_CAP = 200</code>），并排在整个扫描结果的最前面。然后在拼装请求上下文时，<code>RequestContextBuilder</code> 给命中锚点的请求单元<strong>最高优先级</strong>，并且在裁剪到 400 条预算时<strong>跳过它们、不参与淘汰</strong>。</p>
+<p>效果是：不管会话有几万条日志、目标日志 id 排得多靠后，只要端点识别是对的，它一定在最终送给模型的那 400 条里。</p>
+<p>这个设计还有个直接的好处 —— 锚点不是「猜」出来的关键词，而是上一阶段真实验证过的端点，所以它的准确率比任何启发式规则都高。</p>
+<p>当然它也有边界：如果上游端点识别错了，锚点保护不到。这一条我写进了已知问题，没藏。</p>
+<h2 id="六、另一个坑：SQLite-整库变只读"><a href="#六、另一个坑：SQLite-整库变只读" class="headerlink" title="六、另一个坑：SQLite 整库变只读"></a>六、另一个坑：SQLite 整库变只读</h2><p>这个故障值得单独说，因为它跟业务代码一行关系都没有。</p>
+<p>现象是：某台机器上，写入全部失败。日志里 SQLite 报只读，但文件权限看起来正常。</p>
+<p>查下去发现，<code>data/</code> 下的库文件和两个 WAL 边车文件被外部程序加上了 <code>SHR</code> 属性（只读 + 隐藏 + 系统），还带云文件标记。SQLite 打开连接时看到只读属性，就把<strong>整库</strong>当成只读库处理，于是所有写操作失败。</p>
+<p>修法是两层：</p>
+<ol>
+<li>每次建立连接前，清掉这几个文件的只读&#x2F;隐藏&#x2F;系统属性，并把过程记进 stderr，出问题能对上时间点</li>
+<li>写失败统一返回 <strong>503</strong>，附一句人能看懂的话，而不是把 SQLite 的原始错误直接抛到界面上</li>
+</ol>
+<p>第 2 点其实是这个项目一直坚持的做法：错误信息是给同事看的，不是给日志看的。</p>
+<h2 id="七、真机验收：把数字摆出来"><a href="#七、真机验收：把数字摆出来" class="headerlink" title="七、真机验收：把数字摆出来"></a>七、真机验收：把数字摆出来</h2><p>没有真机数据的 AI 项目，可信度等于零。所以这部分我写得很细。</p>
+<p>验收环境：Samsung SM S9010、Android SDK 36、被测应用 <code>com.aegsolar.cloudapp</code> v1.4.0.10151414、模型 deepseek-flash。</p>
+<p><strong>第一轮：自主任务完成登录闭环</strong></p>
+<table>
+<thead>
+<tr>
+<th>项</th>
+<th>结果</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>任务 id</td>
+<td><code>bba5c2b6d6c841a1aab7d2c8a76fca87</code></td>
+</tr>
+<tr>
+<td>步数 &#x2F; 耗时</td>
+<td>4 步 &#x2F; 93 秒</td>
+</tr>
+<tr>
+<td>结果</td>
+<td><code>target_reached = true</code>，<code>evidence_status = response_observed</code></td>
+</tr>
+<tr>
+<td>会话日志量</td>
+<td>32,668 条（候选 7,371 条）</td>
+</tr>
+<tr>
+<td>分析 id</td>
+<td><code>507b0693dc1e4699a2880d82eaf83a33</code></td>
+</tr>
+<tr>
+<td>分析耗时</td>
+<td>13 秒，1 次模型请求</td>
+</tr>
+<tr>
+<td>引用</td>
+<td>8 条真实日志 id</td>
+</tr>
+</tbody></table>
+<p><strong>第二轮：清空数据复跑，验证可重复性</strong></p>
+<p>任务 <code>5e493f81ba4448e9842ae0dc699a9f62</code>，4 步 100 秒，<code>completed</code>；会话 32,321 条日志（应用内 7,364 条）；分析 <code>77800be715b347bc8bb7603d6ddddbc9</code> 1 次请求、400 条入选、结论 <code>supported</code>。</p>
+<p><strong>第三轮：联合源码分析</strong></p>
+<p>任务 <code>a76c3d1421f340bd90ade04a50ce3003</code>：136.679 秒、5 次模型请求、3 轮检索规划，最终发送 400 条日志 + 11 个源码片段（7,606 字符），<code>source_stats.used = true</code>。</p>
+<p>产出的 5 条代码引用我逐条核对过文件和行号，包括 <code>ApiMasterLoginService.kt:34-61</code>、<code>:123-134</code>、<code>LoginMasterReq.kt:4-11</code>、<code>LoginMasterRes.kt:6-17</code>、<code>WebsiteType.kt:51-59</code>。每条都能在快照里对上内容哈希。</p>
+<p><strong>第四轮：从浏览器走完整流程</strong></p>
+<p>三次全流程，其中一次纯参考图驱动（2 步 227 秒），一次 4 步 221 秒并完成 ZIP 导出下载，解压 CRC 校验通过。</p>
+<p>我把这些 ID 都写进了验收文档。原因很简单：出问题的时候，能顺着 id 复现到同一次运行，比任何描述都管用。</p>
+<h2 id="八、源码为什么是「必需输入」，不是「可选增强」"><a href="#八、源码为什么是「必需输入」，不是「可选增强」" class="headerlink" title="八、源码为什么是「必需输入」，不是「可选增强」"></a>八、源码为什么是「必需输入」，不是「可选增强」</h2><p>这个项目有一条 P0 规范，我写在 <code>AGENTS.md</code> 里，语气比较硬：</p>
+<blockquote>
+<p>源码是必要输入，不是可选增强项。配置存在、快照存在或展示「结合源码」标签均不算完成。必须实际检索并向已授权模型提供目标模块相关实现，结论引用服务端校验过的片段 id、文件和行号，并与真实日志 id 对照。只有域名常量等背景代码不能代替接口调用与响应消费逻辑的对照。</p>
+</blockquote>
+<p>为什么这么定？</p>
+<p>因为只看日志能做的是「现象描述」，不是「原因定位」。日志告诉你「这个接口返回了 401」，但「这次 401 是被哪段降级逻辑吞掉的」「这个字段前端到底怎么解析的」，只有源码能回答。</p>
+<p>所以实现上做了一整套约束：</p>
+<ul>
+<li>源码是<strong>固定快照</strong>，不跟着仓库实时变，保证同一份日志 + 同一份代码可以复现结论</li>
+<li>检索是<strong>有界</strong>的，不把整个工程塞进上下文</li>
+<li>发送的片段做<strong>脱敏</strong>，单文件超 512 KiB 截断，源码缓存默认 2 GiB</li>
+<li>模型给出的引用由<strong>服务端校验</strong>，对不上的引用不算数</li>
+<li>设备操作、日志、源码发送是三份<strong>分别授权</strong>，不是一次同意全开</li>
+</ul>
+<p>这里也有一个现实约束：源码不是想读就能读。这个项目对接的是公司 GitLab 上的仓库，我在做的时候只能拿到目标模块的相关文件做快照，所以验收结果是「在 AEG 登录这一条链路上跑通」，而不是「所有模块都通过」。</p>
+<h2 id="九、踩过的坑，以及坑告诉了我什么"><a href="#九、踩过的坑，以及坑告诉了我什么" class="headerlink" title="九、踩过的坑，以及坑告诉了我什么"></a>九、踩过的坑，以及坑告诉了我什么</h2><p>挑几个有代表性的。每条都是「真故障 → 真修复 → 真回归」。</p>
+<p><strong>Android 16 的 <code>dumpsys window windows</code> 不再返回 focus 信息。</strong> 界面结构解析直接拿到空焦点。修法是补 <code>displays</code> 作为兼容来源，而不是硬编码版本号判断。</p>
+<p><strong>模型把动作参数嵌在 <code>tap</code> 子对象里，被严格校验拒绝。</strong> 当时的诱惑是「放宽校验让它过去」。我没有。做法是给模型加扁平化的参数示例，并允许一次自我纠正。白名单和参数结构一个都没松。理由是：今天为兼容模型输出放宽的每一条校验，明天都会变成一个无法解释的现场。</p>
+<p><strong>截图一变，预先规划的动作就失效。</strong> 这是前面说的新鲜观察机制的直接来源。现在输入类动作前如果观察失效，视为可重新观察的异常，重新截图再决策。</p>
+<p><strong>请求日志里没有加密 query，响应里却附带了 query。</strong> 两个日志条目对不上，无法配对。修法是很窄的回退规则：只允许「同线程 + 唯一候选 + 已 END + 原请求无 query」的同端点回退匹配。窄规则意味着宁可配不上，也不乱配。</p>
+<p><strong>导航循环只捕获 <code>StaleObservationError</code>，<code>DeviceControlError</code> 冒到了兜底。</strong> 结果一次正常的系统授权弹窗把任务标成了 <code>error</code>。修法见 4.4。</p>
+<p>这些坑有一个共同点：<strong>它们都不在「模型能力」这一层，而在「系统和模型之间的契约」这一层</strong>。这也是我做完这个项目最大的感受 —— AI 应用真正的工作量，不在调用模型，而在把模型的自由度收敛到一个可以验收的范围里。</p>
+<h2 id="十、边界：现在还不能吹的地方"><a href="#十、边界：现在还不能吹的地方" class="headerlink" title="十、边界：现在还不能吹的地方"></a>十、边界：现在还不能吹的地方</h2><p>写技术文章最容易犯的错是把「跑通了」说成「做完了」。这个项目的边界我列清楚：</p>
+<ul>
+<li>自主排查只在 AEG Ecohome <strong>登录场景</strong>完成了真机验收，不能声称所有模块、所有起始状态、所有应用都通过</li>
+<li>如果设备已经是登录态，抓不到登录接口本身</li>
+<li>服务重启会丢进程级的凭据，需要重新注入</li>
+<li>端点识别错误时，锚点机制保护不到</li>
+<li><code>data/autonomy/&lt;任务ID&gt;/</code> 目前不会自动清理</li>
+<li>Windows 端到端稳定，macOS 有启动脚本但<strong>真机端到端还没验收</strong></li>
+<li>还有偶发测试失败未定位根因，没有当成「环境问题」糊过去</li>
+</ul>
+<p>11 月推广给组内使用，我给自己定了 5 条门槛，其中核心的还是那一条：<strong>同事能不能不看文档、自己跑起来一次完整排查</strong>。做不到就还不算完成。</p>
+<h2 id="十一、这个项目里，我做了什么"><a href="#十一、这个项目里，我做了什么" class="headerlink" title="十一、这个项目里，我做了什么"></a>十一、这个项目里，我做了什么</h2><p>最后说点实在的。这个项目是在 AI 协作下完成的 —— 需求定义、架构拆分、模块边界、验收标准、真机验收和故障定位由我负责，具体实现和测试有 AI 一起写，565 个后端用例和 162 个前端用例也是在这个流程里堆出来的。</p>
+<p>我更愿意把它描述成「<strong>AI 赋能的全栈</strong>」：我一个做了多年 Android 的人，用 Python + FastAPI + React + TypeScript 把一个「操作手机、采日志、结合源码、出证据」的完整工具做了出来，并且能给出真机数字和已知缺陷清单。</p>
+<p>如果只看代码量，这个项目不算大。但它把三件事串起来了：</p>
+<ol>
+<li><strong>产品判断</strong>：把「无感」和「有据」变成可执行的验收标准，而不是口号</li>
+<li><strong>工程判断</strong>：依赖只有 5 个，动作白名单不放宽，引用必须服务端校验</li>
+<li><strong>交付判断</strong>：用真机数据说话，把边界写在文档第一屏</li>
+</ol>
+<p>这三点，比「用了什么框架」更能说明问题。</p>
+<p>项目现在在公司内网 GitLab，跑在本机 <code>127.0.0.1:8766</code>。等 11 月推完组内，我再回来补一篇「推广之后遇到的问题」。</p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/06/08/%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB/glide%E6%BA%90%E7%A0%81%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%95/" rel="next" title="glide源码学习记录">
+                <i class="fa fa-chevron-left"></i> glide源码学习记录
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/avatar.png"
+                alt="clunyes" />
+            
+              <p class="site-author-name" itemprop="name">clunyes</p>
+              <p class="site-description motion-element" itemprop="description">好想去看dac</p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">23</span>
+                    <span class="site-state-item-name">posts</span>
+                  </a>
+                </div>
+              
+
+              
+
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+          
+          
+            <div class="links-of-blogroll motion-element latest-posts">
+              <div class="links-of-blogroll-title"><i class="fa fa-fw fa-list"></i> 最新文章</div>
+              <ul class="links-of-blogroll-list">
+                
+                  <li class="links-of-blogroll-item"><a href="/2026/10/22/ai-logtracing/" title="TraceDock：让 AI 自己点手机抓日志，一次 Android 排查的自动化实践">TraceDock：让 AI 自己点手机抓日志，一次 Android 排查的自动化实践</a></li>
+                
+                  <li class="links-of-blogroll-item"><a href="/2018/06/08/%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB/glide%E6%BA%90%E7%A0%81%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%95/" title="glide源码学习记录">glide源码学习记录</a></li>
+                
+                  <li class="links-of-blogroll-item"><a href="/2017/05/11/%E6%A8%A1%E5%9D%97%E5%8C%96%E6%B5%85%E6%9E%90/" title="模块化浅析">模块化浅析</a></li>
+                
+                  <li class="links-of-blogroll-item"><a href="/2017/03/09/viewStub/" title="viewStub">viewStub</a></li>
+                
+                  <li class="links-of-blogroll-item"><a href="/2017/03/09/android-jni%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/" title="android-jni环境搭建">android-jni环境搭建</a></li>
+                
+                  <li class="links-of-blogroll-item"><a href="/2017/03/08/android%20widget/recycleView/" title="RecyclerView">RecyclerView</a></li>
+                
+                  <li class="links-of-blogroll-item"><a href="/2017/03/02/android%E7%B3%BB%E7%BB%9F%E5%88%86%E6%9E%90/app%E5%90%AF%E5%8A%A8%E4%BC%98%E5%8C%96/" title="app启动优化">app启动优化</a></li>
+                
+                  <li class="links-of-blogroll-item"><a href="/2017/02/28/android%E4%B8%AD%E7%9A%84%E5%90%84%E7%A7%8D%E4%BD%8D%E7%BD%AE/" title="android中的各种位置">android中的各种位置</a></li>
+                
+              </ul>
+            </div>
+          
+
+          
+          
+          
+            <div class="links-of-blogroll motion-element sidebar-timeline">
+              <div class="links-of-blogroll-title"><i class="fa fa-fw fa-clock-o"></i> 时间线</div>
+              <ul class="timeline-list">
+                
+                  <li class="timeline-item"><a href="/archives/#archive-year-2026"><span class="timeline-year">2026</span><span class="timeline-count">1 篇</span></a></li>
+                
+                  <li class="timeline-item"><a href="/archives/#archive-year-2018"><span class="timeline-year">2018</span><span class="timeline-count">1 篇</span></a></li>
+                
+                  <li class="timeline-item"><a href="/archives/#archive-year-2017"><span class="timeline-year">2017</span><span class="timeline-count">13 篇</span></a></li>
+                
+                  <li class="timeline-item"><a href="/archives/#archive-year-2016"><span class="timeline-year">2016</span><span class="timeline-count">8 篇</span></a></li>
+                
+              </ul>
+            </div>
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%80%E3%80%81%E5%AE%83%E5%88%B0%E5%BA%95%E8%A7%A3%E5%86%B3%E8%B0%81%E7%9A%84%E4%BB%80%E4%B9%88%E9%97%AE%E9%A2%98"><span class="nav-number">1.</span> <span class="nav-text">一、它到底解决谁的什么问题</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%8C%E3%80%81%E6%95%B4%E4%BD%93%E9%93%BE%E8%B7%AF%E9%95%BF%E4%BB%80%E4%B9%88%E6%A0%B7"><span class="nav-number">2.</span> <span class="nav-text">二、整体链路长什么样</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%89%E3%80%81%E6%8A%80%E6%9C%AF%E6%A0%88%EF%BC%9A%E5%85%8B%E5%88%B6%E5%88%B0%E4%BB%80%E4%B9%88%E7%A8%8B%E5%BA%A6"><span class="nav-number">3.</span> <span class="nav-text">三、技术栈：克制到什么程度</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9B%9B%E3%80%81%E6%9C%80%E9%9A%BE%E7%9A%84%E4%B8%8D%E6%98%AF%E8%B0%83%E6%A8%A1%E5%9E%8B%EF%BC%8C%E6%98%AF%E6%8A%8A%E8%BE%B9%E7%95%8C%E7%94%BB%E6%AD%BB"><span class="nav-number">4.</span> <span class="nav-text">四、最难的不是调模型，是把边界画死</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#4-1-%E5%8A%A8%E4%BD%9C%E7%99%BD%E5%90%8D%E5%8D%95-%E6%96%B0%E9%B2%9C%E8%A7%82%E5%AF%9F"><span class="nav-number">4.1.</span> <span class="nav-text">4.1 动作白名单 + 新鲜观察</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-2-%E5%8D%B1%E9%99%A9%E5%8A%A8%E4%BD%9C%E5%9C%A8%E6%9C%AC%E5%9C%B0%E6%8B%A6%EF%BC%8C%E4%B8%8D%E9%9D%A0%E6%A8%A1%E5%9E%8B%E8%87%AA%E8%A7%89"><span class="nav-number">4.2.</span> <span class="nav-text">4.2 危险动作在本地拦，不靠模型自觉</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-3-%E6%AF%8F%E4%B8%AA%E5%8A%A8%E4%BD%9C%E5%89%8D%E8%AE%B0%E6%B8%B8%E6%A0%87%EF%BC%8C%E5%8F%AA%E8%AE%A4%E8%BE%B9%E7%95%8C%E4%B9%8B%E5%90%8E%E7%9A%84%E8%AF%81%E6%8D%AE"><span class="nav-number">4.3.</span> <span class="nav-text">4.3 每个动作前记游标，只认边界之后的证据</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-4-%E7%8A%B6%E6%80%81%E6%9C%BA%E5%92%8C%E4%B8%8A%E9%99%90"><span class="nav-number">4.4.</span> <span class="nav-text">4.4 状态机和上限</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%94%E3%80%81%E9%94%9A%E7%82%B9%E6%9C%BA%E5%88%B6%EF%BC%9A%E4%B8%80%E4%B8%AA%E7%9C%9F%E5%AE%9E%E6%80%A7%E8%83%BD%E7%BC%BA%E9%99%B7%E7%9A%84%E4%BF%AE%E5%A4%8D"><span class="nav-number">5.</span> <span class="nav-text">五、锚点机制：一个真实性能缺陷的修复</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%97%AE%E9%A2%98"><span class="nav-number">5.1.</span> <span class="nav-text">问题</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BF%AE%E6%B3%95"><span class="nav-number">5.2.</span> <span class="nav-text">修法</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%AD%E3%80%81%E5%8F%A6%E4%B8%80%E4%B8%AA%E5%9D%91%EF%BC%9ASQLite-%E6%95%B4%E5%BA%93%E5%8F%98%E5%8F%AA%E8%AF%BB"><span class="nav-number">6.</span> <span class="nav-text">六、另一个坑：SQLite 整库变只读</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%83%E3%80%81%E7%9C%9F%E6%9C%BA%E9%AA%8C%E6%94%B6%EF%BC%9A%E6%8A%8A%E6%95%B0%E5%AD%97%E6%91%86%E5%87%BA%E6%9D%A5"><span class="nav-number">7.</span> <span class="nav-text">七、真机验收：把数字摆出来</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%AB%E3%80%81%E6%BA%90%E7%A0%81%E4%B8%BA%E4%BB%80%E4%B9%88%E6%98%AF%E3%80%8C%E5%BF%85%E9%9C%80%E8%BE%93%E5%85%A5%E3%80%8D%EF%BC%8C%E4%B8%8D%E6%98%AF%E3%80%8C%E5%8F%AF%E9%80%89%E5%A2%9E%E5%BC%BA%E3%80%8D"><span class="nav-number">8.</span> <span class="nav-text">八、源码为什么是「必需输入」，不是「可选增强」</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B9%9D%E3%80%81%E8%B8%A9%E8%BF%87%E7%9A%84%E5%9D%91%EF%BC%8C%E4%BB%A5%E5%8F%8A%E5%9D%91%E5%91%8A%E8%AF%89%E4%BA%86%E6%88%91%E4%BB%80%E4%B9%88"><span class="nav-number">9.</span> <span class="nav-text">九、踩过的坑，以及坑告诉了我什么</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8D%81%E3%80%81%E8%BE%B9%E7%95%8C%EF%BC%9A%E7%8E%B0%E5%9C%A8%E8%BF%98%E4%B8%8D%E8%83%BD%E5%90%B9%E7%9A%84%E5%9C%B0%E6%96%B9"><span class="nav-number">10.</span> <span class="nav-text">十、边界：现在还不能吹的地方</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8D%81%E4%B8%80%E3%80%81%E8%BF%99%E4%B8%AA%E9%A1%B9%E7%9B%AE%E9%87%8C%EF%BC%8C%E6%88%91%E5%81%9A%E4%BA%86%E4%BB%80%E4%B9%88"><span class="nav-number">11.</span> <span class="nav-text">十一、这个项目里，我做了什么</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2026</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">clunyes</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/theme-next/hexo-theme-next">NexT.Pisces</a> v6.0.6</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.0.6"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.0.6"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=6.0.6"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=6.0.6"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.0.6"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.0.6"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.0.6"></script>
+
+
+
+  
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
