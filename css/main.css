@@ -2996,14 +2996,14 @@ ul.breadcrumb li+li:last-child {
   color: #6e7681;
   font-family: ui-monospace, monospace;
 }
-.posts-expand .post {
+.home-post-list > .post {
   margin-bottom: 16px;
   padding: 24px 26px;
   background: #161b22;
   border: 1px solid #30363d;
   border-radius: 12px;
 }
-.posts-expand .post-title {
+.home-post-list .post-title {
   font-size: 20px;
   line-height: 1.5;
 }
@@ -3252,7 +3252,7 @@ td {
   .project-grid {
     grid-template-columns: 1fr;
   }
-  .posts-expand .post {
+  .home-post-list > .post {
     padding: 18px 16px;
   }
 }
