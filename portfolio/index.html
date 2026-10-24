@@ -48,6 +48,13 @@ h2{
   border:1px solid rgba(88,166,255,.4);vertical-align:middle;
 }
 .back{margin-bottom:18px}
+.metrics{
+  display:flex;flex-wrap:wrap;gap:22px;
+  margin:14px 0 2px;padding-top:12px;border-top:1px dashed var(--border);
+}
+.metric b{display:block;font-size:17px;font-weight:600;color:var(--text);font-family:ui-monospace,monospace}
+.metric span{font-size:12px;color:var(--muted)}
+.metric em{font-style:normal;color:var(--accent)}
 .back a{color:var(--muted);font-size:13px;text-decoration:none}
 .back a:hover{color:var(--accent)}
 .card p{color:var(--muted);font-size:14px}
@@ -128,6 +135,11 @@ footer{
         动作只允许白名单内的 8 种，每次执行前强制新鲜观察，支付/删除等危险操作由本地执行器拦截，凭据一次性注入且不进模型上下文。
         真机验收覆盖 3 万余条日志的完整登录链路，源码联合分析产出 5 条可逐行核对的代码引用。
       </p>
+      <div class="metrics">
+        <div class="metric"><b>3 万+</b><span>真机日志验收</span></div>
+        <div class="metric"><b>565 / 162</b><span>后端 / 前端用例</span></div>
+        <div class="metric"><b>5</b><span>可逐行核对的源码引用</span></div>
+      </div>
       <div class="meta">Python 3.11 · FastAPI · SQLite WAL · React 19 · TypeScript · Vite · ADB · 视觉模型 · 565 后端 / 162 前端用例</div>
       <div class="meta"><a href="https://clunyes.github.io/2026/10/22/ai-logtracing/">项目复盘：让 AI 自己点手机抓日志 →</a></div>
     </div>
@@ -149,6 +161,11 @@ footer{
         实现方式是 AI 协作：仓库里的 ai/ 目录专门放给 AI 的上下文与红线（AGENTS.md、业务规则、现状与决策、审计报告），
         每次改动都按「现象 → 根因 → 改动 → 验证」留痕；AI 负责写代码，我负责定规则、卡边界和验收。
       </p>
+      <div class="metrics">
+        <div class="metric"><b>260</b><span>unittest 回归</span></div>
+        <div class="metric"><b>C0–C12</b><span>全过才放行 Jenkins</span></div>
+        <div class="metric"><b>16</b><span>配置业务分组</span></div>
+      </div>
       <div class="meta">Python · 标准库 HTTP · Jenkins API · 企微智能表格 · 原生 JS · 260 单测</div>
     </div>
 
@@ -164,7 +181,18 @@ footer{
         落地 6 处修复，覆盖 TransactionTooLargeException（612KB Bundle 超限）、Android 14 Insets 新 API 缺失、
         Glide 持有已销毁 Activity、Gson 循环引用栈溢出等典型场景。
       </p>
-      <div class="meta">Kotlin 2.2 · Hilt · Retrofit · Room · 多模块组件化 · Hybrid · 崩溃治理</div>
+      <p>
+        卡顿治理：以友盟口径（主线程 2 秒无响应）统计，整体卡顿率从 6.2.3 的 6.26% 降到 6.3.0 的 4.97%、6.4.0 的 2.70%。
+        按「次数 × 影响用户」排 TOP 问题，前两位是 WebView 在 onActivityResumed 里执行任务超时（20,499 次 / 9,297 人）
+        与户储首页布局 inflate 层级过深、动画过多（10,079 次 / 4,149 人）。已落地的是把 WebView 预加载改为线程闲时执行；
+        启动任务瘦身、首页计算下沉子线程仍在推进，最新 30 天维度卡顿率 2.38%。
+      </p>
+      <div class="metrics">
+        <div class="metric"><b>6.26% <em>→</em> 2.70%</b><span>卡顿率（6.2.3 → 6.4.0）</span></div>
+        <div class="metric"><b>40+</b><span>组件化模块</span></div>
+        <div class="metric"><b>340</b><span>7 天崩溃 / 39 类</span></div>
+      </div>
+      <div class="meta">Kotlin 2.2 · Hilt · Retrofit · Room · 多模块组件化 · Hybrid · 崩溃治理 · 卡顿治理</div>
     </div>
 
     <div class="card" id="solax-cloud">
@@ -178,6 +206,11 @@ footer{
         与原生双向交互，支持参数回填、中断与恢复；同时提供 H5 蓝牙本地模式，通过 BLE 传输层与 IES2 安全码编解码，
         在无网络时直连设备。
       </p>
+      <div class="metrics">
+        <div class="metric"><b>30</b><span>语种覆盖</span></div>
+        <div class="metric"><b>11</b><span>独立 Vite 构建</span></div>
+        <div class="metric"><b>6</b><span>业务线</span></div>
+      </div>
       <div class="meta">Vue 3.5 · Vite · Vant 4 · Pinia · SSE · vue-i18n · BLE</div>
     </div>
 
