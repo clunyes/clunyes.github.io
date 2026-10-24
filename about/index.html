@@ -103,15 +103,15 @@
   <meta name="keywords" content="Hexo, NexT" />
 
 
-<meta name="description" content="我是 clunyes，本名赵康，Android 工程师，干了八年移动端。 现在主要做光伏储能 App 的 Android 端；前端以 Vue 3 为主，服务端用 Node.js &#x2F; Python，Jenkins、Nginx、Linux 这些运维的活也自己顶。 这个站点只放两类东西：  项目：portfolio 里是这几年真正落地的系统，写了架构、难点和验证数据 复盘：从项目里拆出来的单篇">
+<meta name="description" content="我是赵康（clunyes），八年移动端研发，现在的主线是把散落的手工流程变成可验证的系统。 日常在 Kotlin、Vue 3、Python 之间切换：白天做光伏储能 App 的 Android 端，需要的时候顺手把 H5、内部平台和 CI 一起处理掉。 现在在做什么 SolaX 光伏储能 App：户用储能、工商业储能、安装商三套 App 共用一套业务库，40+ 模块按目录自动装配；线上崩溃按「发生">
 <meta property="og:type" content="website">
-<meta property="og:title" content="about">
+<meta property="og:title" content="关于">
 <meta property="og:url" content="https://clunyes.github.io/about/index.html">
 <meta property="og:site_name" content="clunyes_blog">
-<meta property="og:description" content="我是 clunyes，本名赵康，Android 工程师，干了八年移动端。 现在主要做光伏储能 App 的 Android 端；前端以 Vue 3 为主，服务端用 Node.js &#x2F; Python，Jenkins、Nginx、Linux 这些运维的活也自己顶。 这个站点只放两类东西：  项目：portfolio 里是这几年真正落地的系统，写了架构、难点和验证数据 复盘：从项目里拆出来的单篇">
+<meta property="og:description" content="我是赵康（clunyes），八年移动端研发，现在的主线是把散落的手工流程变成可验证的系统。 日常在 Kotlin、Vue 3、Python 之间切换：白天做光伏储能 App 的 Android 端，需要的时候顺手把 H5、内部平台和 CI 一起处理掉。 现在在做什么 SolaX 光伏储能 App：户用储能、工商业储能、安装商三套 App 共用一套业务库，40+ 模块按目录自动装配；线上崩溃按「发生">
 <meta property="og:locale">
-<meta property="article:published_time" content="2018-03-15T06:40:52.000Z">
-<meta property="article:modified_time" content="2026-10-24T02:37:54.627Z">
+<meta property="article:published_time" content="2026-10-24T02:00:00.000Z">
+<meta property="article:modified_time" content="2026-10-24T03:24:16.337Z">
 <meta property="article:author" content="clunyes">
 <meta name="twitter:card" content="summary">
 
@@ -130,7 +130,7 @@
   };
 </script>
 
-  <title>about | clunyes_blog</title>
+  <title>关于 | clunyes_blog</title>
   
 
 
@@ -307,7 +307,7 @@
     <div class="post-block page">
       <header class="post-header">
 
-<h1 class="post-title" itemprop="name headline">about</h1>
+<h1 class="post-title" itemprop="name headline">关于</h1>
 
 <div class="post-meta">
   
@@ -325,18 +325,56 @@
       <div class="post-body">
         
         
-          <p>我是 clunyes，本名赵康，Android 工程师，干了八年移动端。</p>
-<p>现在主要做光伏储能 App 的 Android 端；前端以 Vue 3 为主，服务端用 Node.js &#x2F; Python，Jenkins、Nginx、Linux 这些运维的活也自己顶。</p>
-<p>这个站点只放两类东西：</p>
-<ul>
-<li><strong>项目</strong>：<a href="/portfolio/">portfolio</a> 里是这几年真正落地的系统，写了架构、难点和验证数据</li>
-<li><strong>复盘</strong>：从项目里拆出来的单篇记录，重点写「问题怎么来的、我做了什么取舍、结果怎么验的」</li>
+          <p>我是赵康（clunyes），八年移动端研发，现在的主线是<strong>把散落的手工流程变成可验证的系统</strong>。</p>
+<p>日常在 Kotlin、Vue 3、Python 之间切换：白天做光伏储能 App 的 Android 端，需要的时候顺手把 H5、内部平台和 CI 一起处理掉。</p>
+<h2 id="现在在做什么"><a href="#现在在做什么" class="headerlink" title="现在在做什么"></a>现在在做什么</h2><ul>
+<li><strong>SolaX 光伏储能 App</strong>：户用储能、工商业储能、安装商三套 App 共用一套业务库，40+ 模块按目录自动装配；线上崩溃按「发生次数 × 影响用户 × 可定位度」排优先级治理。</li>
+<li><strong>SolaX Cloud 移动端 H5</strong>：六条业务线、30 个语种，split-build 拆成 11 份 Vite 配置独立构建，含 SSE 流式对话与 H5 蓝牙本地模式。</li>
+<li><strong>ODM Pack</strong>：把改配置、选分支、跑预检、触发 Jenkins、回写台账收进一条四步向导，C0–C12 预检全过才放行，260 个单测守回归。</li>
+<li><strong>TraceDock</strong>：让 AI 自己操作真机去复现问题、抓 logcat，产出能逐行对回原始日志的结论。</li>
 </ul>
-<p>2016–2018 年的速查类笔记（RxJava 操作符、Gradle 参数、Android 代号表之类）已经归档，不再对外——这些内容现在问 AI 一秒就有，没必要占版面。</p>
-<p>承接各种项目，也欢迎聊技术：</p>
+<p>细节、架构取舍和验证数据都在 <a href="/portfolio/">项目</a> 页。</p>
+<h2 id="技术栈"><a href="#技术栈" class="headerlink" title="技术栈"></a>技术栈</h2><table>
+<thead>
+<tr>
+<th>方向</th>
+<th>常用</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Android</td>
+<td>Kotlin &#x2F; Coroutines &#x2F; Jetpack &#x2F; Hilt &#x2F; Retrofit &#x2F; Room &#x2F; 多模块组件化 &#x2F; Hybrid &#x2F; 崩溃治理</td>
+</tr>
+<tr>
+<td>前端</td>
+<td>Vue 3 &#x2F; TypeScript &#x2F; Vite &#x2F; Pinia &#x2F; Vant &#x2F; 小程序 &#x2F; H5</td>
+</tr>
+<tr>
+<td>服务端</td>
+<td>Node.js &#x2F; Python（FastAPI、标准库 HTTP）&#x2F; SQLite &#x2F; REST</td>
+</tr>
+<tr>
+<td>交付运维</td>
+<td>Jenkins &#x2F; CI 流水线 &#x2F; Linux &#x2F; Docker &#x2F; Nginx &#x2F; 自动化脚本</td>
+</tr>
+</tbody></table>
+<h2 id="我怎么工作"><a href="#我怎么工作" class="headerlink" title="我怎么工作"></a>我怎么工作</h2><ol>
+<li><strong>先定规则和边界，再写代码。</strong> 给 AI 的上下文和红线单独放在仓库里，改动按「现象 → 根因 → 改动 → 验证」留痕。</li>
+<li><strong>结果必须能用数据核对。</strong> 性能说降了多少、崩溃说覆盖多少用户、工具说跑过多少条日志，不写”显著提升”。</li>
+<li><strong>重复第三次就自动化。</strong> 手工步骤值得固化成脚本、向导或流水线，而不是靠人记得住。</li>
+<li><strong>异常先复现，再改。</strong> 定位不了的问题，先补观测手段。</li>
+</ol>
+<h2 id="这个博客写什么"><a href="#这个博客写什么" class="headerlink" title="这个博客写什么"></a>这个博客写什么</h2><p>只放两类东西：</p>
 <ul>
-<li>邮箱：<a href="mailto:&#x63;&#108;&#x75;&#x6e;&#x79;&#101;&#x73;&#x40;&#49;&#x32;&#54;&#x2e;&#x63;&#x6f;&#109;">&#x63;&#108;&#x75;&#x6e;&#x79;&#101;&#x73;&#x40;&#49;&#x32;&#54;&#x2e;&#x63;&#x6f;&#109;</a></li>
+<li><strong>项目</strong>：真正落地过的系统，写架构、难点和验证数据。</li>
+<li><strong>复盘</strong>：从项目里拆出来的单篇记录，重点是问题怎么来的、我做了什么取舍、结果怎么验的。</li>
+</ul>
+<p>2016–2018 年的速查类笔记（RxJava 操作符、Gradle 参数、Android 代号表之类）已经归档——这些内容现在问 AI 一秒就有，没必要占版面。</p>
+<h2 id="联系"><a href="#联系" class="headerlink" title="联系"></a>联系</h2><p>承接项目，也欢迎聊技术。</p>
+<ul>
+<li>邮箱：<a href="mailto:clunyes@126.com">clunyes@126.com</a></li>
 <li>微信：15158121565</li>
+<li>GitHub：<a target="_blank" rel="noopener" href="https://github.com/clunyes">github.com&#x2F;clunyes</a></li>
 </ul>
 
         
@@ -381,8 +419,17 @@
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
 
-      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+      <section class="site-overview-wrap sidebar-panel">
         <div class="site-overview">
           <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
             
@@ -391,7 +438,7 @@
                 alt="clunyes" />
             
               <p class="site-author-name" itemprop="name">clunyes</p>
-              <p class="site-description motion-element" itemprop="description">好想去看dac</p>
+              <p class="site-description motion-element" itemprop="description">项目复盘与工程笔记</p>
           </div>
 
           
@@ -457,6 +504,22 @@
         </div>
       </section>
 
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%8E%B0%E5%9C%A8%E5%9C%A8%E5%81%9A%E4%BB%80%E4%B9%88"><span class="nav-number">1.</span> <span class="nav-text">现在在做什么</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8A%80%E6%9C%AF%E6%A0%88"><span class="nav-number">2.</span> <span class="nav-text">技术栈</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%88%91%E6%80%8E%E4%B9%88%E5%B7%A5%E4%BD%9C"><span class="nav-number">3.</span> <span class="nav-text">我怎么工作</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%BF%99%E4%B8%AA%E5%8D%9A%E5%AE%A2%E5%86%99%E4%BB%80%E4%B9%88"><span class="nav-number">4.</span> <span class="nav-text">这个博客写什么</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%81%94%E7%B3%BB"><span class="nav-number">5.</span> <span class="nav-text">联系</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
       
 
       
