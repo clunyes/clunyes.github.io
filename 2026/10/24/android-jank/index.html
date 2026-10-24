@@ -1,0 +1,941 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.0.6" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.png?v=6.0.6">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.png?v=6.0.6">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.png?v=6.0.6">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.0.6" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '',
+    scheme: 'Pisces',
+    version: '6.0.6',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  
+
+<meta name="description" content="线上卡顿最麻烦的地方不是改代码，是你根本不知道改哪一段。 崩溃有堆栈、有文件行号，定位思路是清晰的；卡顿只有一句「主线程在某个时间窗口里没响应」，堆栈常常停在 native 层，或者停在一个你完全没写过的框架方法里。一个功能复杂的首页，上有启动任务、下有 WebView、中间还有几十层布局，任何一处都可能超时。 这篇复盘记录的是一次真实的卡顿治理：数据口径怎么定、优先级怎么排、改了什么、哪些没改、">
+<meta property="og:type" content="article">
+<meta property="og:title" content="卡顿治理复盘：先统一口径，再排优先级">
+<meta property="og:url" content="https://clunyes.github.io/2026/10/24/android-jank/index.html">
+<meta property="og:site_name" content="clunyes_blog">
+<meta property="og:description" content="线上卡顿最麻烦的地方不是改代码，是你根本不知道改哪一段。 崩溃有堆栈、有文件行号，定位思路是清晰的；卡顿只有一句「主线程在某个时间窗口里没响应」，堆栈常常停在 native 层，或者停在一个你完全没写过的框架方法里。一个功能复杂的首页，上有启动任务、下有 WebView、中间还有几十层布局，任何一处都可能超时。 这篇复盘记录的是一次真实的卡顿治理：数据口径怎么定、优先级怎么排、改了什么、哪些没改、">
+<meta property="og:locale">
+<meta property="article:published_time" content="2026-10-24T03:00:00.000Z">
+<meta property="article:modified_time" content="2026-10-24T03:41:23.020Z">
+<meta property="article:author" content="clunyes">
+<meta property="article:tag" content="Android">
+<meta property="article:tag" content="性能">
+<meta name="twitter:card" content="summary">
+
+
+
+
+
+
+  <link rel="canonical" href="https://clunyes.github.io/2026/10/24/android-jank/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>卡顿治理复盘：先统一口径，再排优先级 | clunyes_blog</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"> 
+
+<div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">clunyes_blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">项目复盘与工程笔记</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+          
+  <li class="menu-item menu-item-home">
+    <a href="/%20" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />Home</a>
+</li>
+
+      
+        
+        
+          
+  <li class="menu-item menu-item-about">
+    <a href="/about/%20" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-user"></i> <br />About</a>
+</li>
+
+      
+        
+        
+          
+  <li class="menu-item menu-item-archives">
+    <a href="/archives/%20" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />Archives</a>
+</li>
+
+      
+        
+        
+          
+  <li class="menu-item menu-item-portfolio">
+    <a href="/portfolio/%20" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-code"></i> <br />项目</a>
+</li>
+
+      
+
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+  
+
+
+
+ </div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://clunyes.github.io/2026/10/24/android-jank/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="clunyes">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="clunyes_blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">卡顿治理复盘：先统一口径，再排优先级</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2026-10-24T11:00:00+08:00">2026-10-24</time>
+            
+
+            
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/%E5%A4%8D%E7%9B%98/" itemprop="url" rel="index"><span itemprop="name">复盘</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>线上卡顿最麻烦的地方不是改代码，是<strong>你根本不知道改哪一段</strong>。</p>
+<p>崩溃有堆栈、有文件行号，定位思路是清晰的；卡顿只有一句「主线程在某个时间窗口里没响应」，堆栈常常停在 native 层，或者停在一个你完全没写过的框架方法里。一个功能复杂的首页，上有启动任务、下有 WebView、中间还有几十层布局，任何一处都可能超时。</p>
+<p>这篇复盘记录的是一次真实的卡顿治理：数据口径怎么定、优先级怎么排、改了什么、哪些没改、以及后来为什么数据没按预期下降。涉及的业务与包名做脱敏处理，数字保持原样。</p>
+<span id="more"></span>
+
+<h2 id="一、先把口径说清楚：卡顿不等于-ANR"><a href="#一、先把口径说清楚：卡顿不等于-ANR" class="headerlink" title="一、先把口径说清楚：卡顿不等于 ANR"></a>一、先把口径说清楚：卡顿不等于 ANR</h2><p>做这件事之前，团队里对「卡顿」的理解是混的。有人拿 ANR 率说事，有人拿用户反馈说事，两边对不上。</p>
+<p>我们用的第三方 APM 平台给出的定义是：</p>
+<ul>
+<li><strong>卡顿</strong>：SDK 监控到主线程消息执行超时的次数，Android 侧 2 秒无响应即计一次</li>
+<li><strong>ANR</strong>：5 秒未响应，系统级，会弹「应用无响应」</li>
+</ul>
+<p>也就是说，<strong>卡顿是 ANR 的前置信号</strong>，而且门槛低得多。用户体感上「不跟手」「点了没反应」，大多落在卡顿区间，还没到 ANR。我们当时的 ANR 率稳定在 0.15%，看着很低；但卡顿率是个位数百分比，量级完全不同。</p>
+<p>口径定下来之后，结论直接变了：<strong>优先修 ANR，再修卡顿</strong>。因为严重卡顿本身就是 ANR，ANR 修掉，卡顿的分母也会跟着掉。反过来只盯卡顿，很可能在优化一些用户根本感知不到的边角。</p>
+<h2 id="二、看趋势，而不是看单点"><a href="#二、看趋势，而不是看单点" class="headerlink" title="二、看趋势，而不是看单点"></a>二、看趋势，而不是看单点</h2><p>平台只能查 90 天，所以按能覆盖到的主力版本横向比：</p>
+<table>
+<thead>
+<tr>
+<th>版本</th>
+<th>整体卡顿率</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>6.2.3</td>
+<td>6.26%</td>
+</tr>
+<tr>
+<td>6.3.0</td>
+<td>4.97%</td>
+</tr>
+<tr>
+<td>6.4.0</td>
+<td>2.70%</td>
+</tr>
+</tbody></table>
+<p>趋势是向好的，但这组数字只能说明「版本在变好」，不能说明「我们的优化起作用了」——版本迭代本身会带进其它改动。所以真正的判断依据只能是单点改动前后、同一版本内的对比，这一点在后面会踩坑。</p>
+<p>同期版本维度的错误分布也很典型：</p>
+<table>
+<thead>
+<tr>
+<th>版本</th>
+<th>卡顿次数</th>
+<th>影响用户数</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>6.2.3</td>
+<td>47,729</td>
+<td>14,407</td>
+</tr>
+<tr>
+<td>6.2.0</td>
+<td>24,206</td>
+<td>7,191</td>
+</tr>
+<tr>
+<td>6.3.0</td>
+<td>21,955</td>
+<td>8,179</td>
+</tr>
+<tr>
+<td>6.1.1</td>
+<td>1,245</td>
+<td>412</td>
+</tr>
+</tbody></table>
+<p>老版本存量用户多、设备更旧，贡献了大部分卡顿次数。</p>
+<h2 id="三、从-native-堆栈里筛出「能动手」的问题"><a href="#三、从-native-堆栈里筛出「能动手」的问题" class="headerlink" title="三、从 native 堆栈里筛出「能动手」的问题"></a>三、从 native 堆栈里筛出「能动手」的问题</h2><p>卡顿模块给出的前 10 堆栈，大部分停在 native：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">android.graphics.BitmapFactory.nativeDecodeAsset</span><br><span class="line">android.os.BinderProxy.transactNative</span><br><span class="line">android.os.MessageQueue.nativePollOnce</span><br><span class="line">android.graphics.HardwareRenderer.nSetStopped</span><br><span class="line">android.content.res.AssetManager.nativeApplyStyle</span><br><span class="line">android.content.res.ApkAssets.getStringFromPool</span><br><span class="line">android.webkit.WebViewLibraryLoader.nativeLoadWithRelroFile</span><br></pre></td></tr></table></figure>
+
+<p>这些帧本身没法改，但每一帧背后对应一类业务行为：图片解码、Binder 跨进程调用、消息队列空转、硬件渲染、资源与样式加载、WebView 初始化。</p>
+<p>筛选标准就一条：<strong>日志里能看清调用方、能对应到一个具体业务动作</strong>。前 10 里筛出 7 个符合，剩下的归为「观测不到，先不动」。</p>
+<p>这一步的意义是把「性能优化」这种虚词，变成一张可执行的清单：图片加载、消息队列、渲染、asset 加载、WebView 初始化，各自对应不同的手段。</p>
+<h2 id="四、TOP-2：两个问题占了绝大多数次数"><a href="#四、TOP-2：两个问题占了绝大多数次数" class="headerlink" title="四、TOP 2：两个问题占了绝大多数次数"></a>四、TOP 2：两个问题占了绝大多数次数</h2><p><strong>问题一：<code>MasterBaseApplication.onActivityResumed</code> 里的 WebView 任务超时</strong></p>
+<ul>
+<li>卡顿 20,499 次，影响用户 9,297 人</li>
+<li>根因：WebView 内部执行 task 超时。当时为了「进首页更快」，在 Application 层做了 WebView 预加载，而预加载本身要抢 CPU 和内存</li>
+</ul>
+<p><strong>问题二：户储首页布局 inflate 过重</strong></p>
+<ul>
+<li>卡顿 10,079 次，影响用户 4,149 人</li>
+<li>根因：首页 <code>FragmentHomeStorageMainBinding.inflate</code> 层级深、动画多、进入页面时还有大量计算</li>
+</ul>
+<p>设备分布也印证了这一点：</p>
+<table>
+<thead>
+<tr>
+<th>机型</th>
+<th>卡顿次数</th>
+<th>影响用户数</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>M2006C3MNG（红米 9C）</td>
+<td>4,652</td>
+<td>84</td>
+</tr>
+<tr>
+<td>SM-A325F</td>
+<td>2,478</td>
+<td>450</td>
+</tr>
+<tr>
+<td>SM-A145R</td>
+<td>2,461</td>
+<td>513</td>
+</tr>
+<tr>
+<td>SM-A515F</td>
+<td>2,292</td>
+<td>540</td>
+</tr>
+</tbody></table>
+<p>次数最多的是红米 9C 这类低端机，但影响用户数最多的是三星 A 系列中端机。<strong>这两个维度必须一起看</strong>：只按次数排，会全部去修低端机；只按人数排，会忽略掉「同一台机器反复卡」这种体验塌陷的信号。</p>
+<h2 id="五、真正改了什么"><a href="#五、真正改了什么" class="headerlink" title="五、真正改了什么"></a>五、真正改了什么</h2><p>按上面的优先级，卡顿点归成三类：</p>
+<ol>
+<li><strong>启动时加载任务过多</strong>。低端机上启动任务要跑 2–4 秒，这段时间内做什么都卡。</li>
+<li><strong>进入首页时的 WebView 预加载</strong>。实测低端机进首页时，启动任务还没跑完，此时加载 WebView 直接叠加成卡顿。</li>
+<li><strong>户储首页本身重</strong>。动画多、图片多、计算多，绘制压力大。</li>
+</ol>
+<p><strong>只有第 2 项完成了改动</strong>：把 WebView 从「进页面就预加载」改成<strong>线程闲时再预加载</strong>。逻辑很简单——主线程忙着的时候抢资源，预加载反而变成了负担，用户看到的还是卡；放到空闲时执行，预加载才有意义。</p>
+<p>第 1 项和第 3 项目前没动：</p>
+<ul>
+<li>启动任务需要先梳理出「哪些不是必须的、哪些占用最大」。这块改动敏感，动错就是功能可用性问题，必须先确认清单再动手。</li>
+<li>首页计算下放到子线程是可行方向，但涉及数据流改动，需要单独排期。</li>
+</ul>
+<h2 id="六、结果没有想象中好看"><a href="#六、结果没有想象中好看" class="headerlink" title="六、结果没有想象中好看"></a>六、结果没有想象中好看</h2><p>改完第 2 项，等了一个版本周期看数据：<strong>卡顿率没有明显下降</strong>。30 天维度仍在 2.38%，卡顿次数两万一千多。</p>
+<p>原因不难解释：第 2 项只是三个叠加因素里的一个，而第 1 项（启动任务）才是低端机体验的真正瓶颈。问题 1、2、3 在「打开 App → 进首页」这条链路上是串行触发的，只拆掉中间一环，整体不会质变。</p>
+<p>这也是这次最值得记下来的教训：<strong>单点优化要挑在链路的瓶颈上，否则测出来的数据会一直告诉你「没用」</strong>。</p>
+<h2 id="七、事后总结"><a href="#七、事后总结" class="headerlink" title="七、事后总结"></a>七、事后总结</h2><ol>
+<li><strong>口径先统一，否则没法讨论。</strong> 卡顿和 ANR 混着说，永远排不出优先级。</li>
+<li><strong>次数和人数要一起排。</strong> 前者是修复成本，后者是体验收益。</li>
+<li><strong>预加载不是免费的。</strong> 在低端机上，它和启动任务抢的是同一份资源，闲时执行才成立。</li>
+<li><strong>观测周期要留够。</strong> 改完立刻看数据，很容易被版本波动骗过去；至少等一个完整版本周期。</li>
+<li><strong>别把「没下降」藏起来。</strong> 这次最有价值的不是那个 6.26% → 2.70% 的趋势，而是知道瓶颈在启动任务上——这条结论只有承认前一次改动没生效才拿得到。</li>
+</ol>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Android/" rel="tag"># Android</a>
+          
+            <a href="/tags/%E6%80%A7%E8%83%BD/" rel="tag"># 性能</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2026/10/22/ai-logtracing/" rel="next" title="TraceDock：让 AI 自己点手机抓日志，一次 Android 排查的自动化实践">
+                <i class="fa fa-chevron-left"></i> TraceDock：让 AI 自己点手机抓日志，一次 Android 排查的自动化实践
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/avatar.png"
+                alt="clunyes" />
+            
+              <p class="site-author-name" itemprop="name">clunyes</p>
+              <p class="site-description motion-element" itemprop="description">项目复盘与工程笔记</p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">2</span>
+                    <span class="site-state-item-name">posts</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                    
+                      
+                    
+                    <span class="site-state-item-count">1</span>
+                    <span class="site-state-item-name">categories</span>
+                  
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">2</span>
+                    <span class="site-state-item-name">tags</span>
+                  
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+          
+          
+            <div class="links-of-blogroll motion-element latest-posts">
+              <div class="links-of-blogroll-title"><i class="fa fa-fw fa-list"></i> 最新文章</div>
+              <ul class="links-of-blogroll-list">
+                
+                  <li class="links-of-blogroll-item"><a href="/2026/10/24/android-jank/" title="卡顿治理复盘：先统一口径，再排优先级">卡顿治理复盘：先统一口径，再排优先级</a></li>
+                
+                  <li class="links-of-blogroll-item"><a href="/2026/10/22/ai-logtracing/" title="TraceDock：让 AI 自己点手机抓日志，一次 Android 排查的自动化实践">TraceDock：让 AI 自己点手机抓日志，一次 Android 排查的自动化实践</a></li>
+                
+              </ul>
+            </div>
+          
+
+          
+          
+          
+            <div class="links-of-blogroll motion-element sidebar-timeline">
+              <div class="links-of-blogroll-title"><i class="fa fa-fw fa-clock-o"></i> 时间线</div>
+              <ul class="timeline-list">
+                
+                  <li class="timeline-item"><a href="/archives/#archive-year-2026"><span class="timeline-year">2026</span><span class="timeline-count">2 篇</span></a></li>
+                
+              </ul>
+            </div>
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%80%E3%80%81%E5%85%88%E6%8A%8A%E5%8F%A3%E5%BE%84%E8%AF%B4%E6%B8%85%E6%A5%9A%EF%BC%9A%E5%8D%A1%E9%A1%BF%E4%B8%8D%E7%AD%89%E4%BA%8E-ANR"><span class="nav-number">1.</span> <span class="nav-text">一、先把口径说清楚：卡顿不等于 ANR</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%8C%E3%80%81%E7%9C%8B%E8%B6%8B%E5%8A%BF%EF%BC%8C%E8%80%8C%E4%B8%8D%E6%98%AF%E7%9C%8B%E5%8D%95%E7%82%B9"><span class="nav-number">2.</span> <span class="nav-text">二、看趋势，而不是看单点</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%89%E3%80%81%E4%BB%8E-native-%E5%A0%86%E6%A0%88%E9%87%8C%E7%AD%9B%E5%87%BA%E3%80%8C%E8%83%BD%E5%8A%A8%E6%89%8B%E3%80%8D%E7%9A%84%E9%97%AE%E9%A2%98"><span class="nav-number">3.</span> <span class="nav-text">三、从 native 堆栈里筛出「能动手」的问题</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9B%9B%E3%80%81TOP-2%EF%BC%9A%E4%B8%A4%E4%B8%AA%E9%97%AE%E9%A2%98%E5%8D%A0%E4%BA%86%E7%BB%9D%E5%A4%A7%E5%A4%9A%E6%95%B0%E6%AC%A1%E6%95%B0"><span class="nav-number">4.</span> <span class="nav-text">四、TOP 2：两个问题占了绝大多数次数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%94%E3%80%81%E7%9C%9F%E6%AD%A3%E6%94%B9%E4%BA%86%E4%BB%80%E4%B9%88"><span class="nav-number">5.</span> <span class="nav-text">五、真正改了什么</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%AD%E3%80%81%E7%BB%93%E6%9E%9C%E6%B2%A1%E6%9C%89%E6%83%B3%E8%B1%A1%E4%B8%AD%E5%A5%BD%E7%9C%8B"><span class="nav-number">6.</span> <span class="nav-text">六、结果没有想象中好看</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%83%E3%80%81%E4%BA%8B%E5%90%8E%E6%80%BB%E7%BB%93"><span class="nav-number">7.</span> <span class="nav-text">七、事后总结</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2026</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">clunyes</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/theme-next/hexo-theme-next">NexT.Pisces</a> v6.0.6</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.0.6"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.0.6"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=6.0.6"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=6.0.6"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.0.6"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.0.6"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.0.6"></script>
+
+
+
+  
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

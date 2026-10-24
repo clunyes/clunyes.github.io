@@ -295,7 +295,7 @@
     </div>
     <div class="hero-actions">
       <a class="hero-btn hero-btn-primary" href="/portfolio/">项目与能力 <i class="fa fa-arrow-right"></i></a>
-      <a class="hero-btn" href="/2026/10/22/ai-logtracing/">读一篇复盘</a>
+      <a class="hero-btn" href="/2026/10/24/android-jank/">读一篇复盘</a>
     </div>
   </section>
 
@@ -347,6 +347,154 @@
   
 
   <section id="posts" class="posts-expand home-post-list">
+    
+      
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://clunyes.github.io/2026/10/24/android-jank/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="clunyes">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="clunyes_blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2026/10/24/android-jank/" itemprop="url">卡顿治理复盘：先统一口径，再排优先级</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2026-10-24T11:00:00+08:00">2026-10-24</time>
+            
+
+            
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/%E5%A4%8D%E7%9B%98/" itemprop="url" rel="index"><span itemprop="name">复盘</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          <p>线上卡顿最麻烦的地方不是改代码，是<strong>你根本不知道改哪一段</strong>。</p>
+<p>崩溃有堆栈、有文件行号，定位思路是清晰的；卡顿只有一句「主线程在某个时间窗口里没响应」，堆栈常常停在 native 层，或者停在一个你完全没写过的框架方法里。一个功能复杂的首页，上有启动任务、下有 WebView、中间还有几十层布局，任何一处都可能超时。</p>
+<p>这篇复盘记录的是一次真实的卡顿治理：数据口径怎么定、优先级怎么排、改了什么、哪些没改、以及后来为什么数据没按预期下降。涉及的业务与包名做脱敏处理，数字保持原样。</p>
+          <!--noindex-->
+          <div class="post-more-link text-center">
+            <a class="btn" href="/2026/10/24/android-jank/" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
     
       
 
@@ -530,14 +678,42 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">1</span>
+                    <span class="site-state-item-count">2</span>
                     <span class="site-state-item-name">posts</span>
                   </a>
                 </div>
               
 
               
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                    
+                      
+                    
+                    <span class="site-state-item-count">1</span>
+                    <span class="site-state-item-name">categories</span>
+                  
+                </div>
+              
 
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">2</span>
+                    <span class="site-state-item-name">tags</span>
+                  
+                </div>
               
             </nav>
           
@@ -559,6 +735,8 @@
               <div class="links-of-blogroll-title"><i class="fa fa-fw fa-list"></i> 最新文章</div>
               <ul class="links-of-blogroll-list">
                 
+                  <li class="links-of-blogroll-item"><a href="/2026/10/24/android-jank/" title="卡顿治理复盘：先统一口径，再排优先级">卡顿治理复盘：先统一口径，再排优先级</a></li>
+                
                   <li class="links-of-blogroll-item"><a href="/2026/10/22/ai-logtracing/" title="TraceDock：让 AI 自己点手机抓日志，一次 Android 排查的自动化实践">TraceDock：让 AI 自己点手机抓日志，一次 Android 排查的自动化实践</a></li>
                 
               </ul>
@@ -572,7 +750,7 @@
               <div class="links-of-blogroll-title"><i class="fa fa-fw fa-clock-o"></i> 时间线</div>
               <ul class="timeline-list">
                 
-                  <li class="timeline-item"><a href="/archives/#archive-year-2026"><span class="timeline-year">2026</span><span class="timeline-count">1 篇</span></a></li>
+                  <li class="timeline-item"><a href="/archives/#archive-year-2026"><span class="timeline-year">2026</span><span class="timeline-count">2 篇</span></a></li>
                 
               </ul>
             </div>
